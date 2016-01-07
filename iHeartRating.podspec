@@ -28,7 +28,7 @@ Pod::Spec.new do |s|
                    iHeartRating provides easy heart, star or any other image type ratings.
                    DESC
 
-  s.homepage     = "https://garethpaul.com"
+  s.homepage     = "https://github.com/garethpaul/iHeartRating"
   # s.screenshots  = "www.example.com/screenshots_1.gif", "www.example.com/screenshots_2.gif"
 
   # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -64,7 +64,6 @@ Pod::Spec.new do |s|
   #
 
   s.platform     = :ios
-  s.platform     = :ios, "8.0"
 
   #  When using multiple platforms
   # s.ios.deployment_target = "5.0"
