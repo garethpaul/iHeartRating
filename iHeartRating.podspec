@@ -16,8 +16,8 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "iHeartRating"
-  s.version      = "0.1.3"
-  s.summary      = "iHeartRating provides rating functionality for hearts"
+  s.version      = "0.1.5"
+  s.summary      = "iHeartRating provides rating functionality for hearts or any image extends UIView"
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -26,6 +26,7 @@ Pod::Spec.new do |s|
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   s.description  = <<-DESC
                    iHeartRating provides easy heart, star or any other image type ratings.
+                   We extend UIView to provide a simple easy rating.
                    DESC
 
   s.homepage     = "https://github.com/garethpaul/iHeartRating"
