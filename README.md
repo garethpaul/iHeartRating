@@ -38,4 +38,4 @@ class ViewController: UIViewController, HeartRatingViewDelegate {
 
 In addition here is a sample setup in a storyboard
 
-<img src="https://raw.github.com/garethpaul/iheartrating/master/assets/storyboard.png" alt="storyboard" width="150"
+<img src="https://raw.github.com/garethpaul/iheartrating/master/assets/storyboard.png" alt="storyboard" style="width:150px" />
