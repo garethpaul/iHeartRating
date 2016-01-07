@@ -14,7 +14,7 @@ end
 
 ## Sample Usage
 
-Here is a ViewController :-
+Here is a sample ViewController :-
 
 ```
 import iHeartRating
@@ -35,3 +35,6 @@ class ViewController: UIViewController, HeartRatingViewDelegate {
 
 }
 ```
+
+In addition here is a sample setup in a storyboard :-
+<img src="https://raw.github.com/garethpaul/iheartrating/master/assets/screen_shot_storyboard.png" alt="Logo" width="150" 
