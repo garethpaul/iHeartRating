@@ -2,3 +2,12 @@
 
 # iHeartRating
 Simple Ratings View for iOS enabling you to use any image as a rating e.g. hearts, stars, pigeons etc.
+
+# Getting Started
+You want to add `pod 'iHeartRating', '~> 0.1'` to the following to your Podfile:
+
+```
+target 'MyApp' do
+  pod 'iHeartRating', '~> 0.1'
+end
+```
