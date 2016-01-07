@@ -36,5 +36,6 @@ class ViewController: UIViewController, HeartRatingViewDelegate {
 }
 ```
 
-In addition here is a sample setup in a storyboard :-
-<img src="https://raw.github.com/garethpaul/iheartrating/master/assets/screen_shot_storyboard.png" alt="Logo" width="150" 
+In addition here is a sample setup in a storyboard
+
+<img src="https://raw.github.com/garethpaul/iheartrating/master/assets/storyboard.png" alt="storyboard" width="150"
