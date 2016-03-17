@@ -131,6 +131,12 @@ public class HeartRatingView: UIView {
      */
     @IBInspectable public var floatRatings: Bool = false
     
+    /**
+     Image should twerk when tap
+     */
+    @IBInspectable public var shouldBounce: Bool = false
+    
+    
     
     // MARK: Initializations
     
@@ -318,18 +324,23 @@ public class HeartRatingView: UIView {
     override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         // Update delegate
         if let delegate = self.delegate {
+            
             delegate.heartRatingView(self, didUpdate: self.rating)
             
-            self.fullImageViews[Int(self.rating)].transform = CGAffineTransformMakeScale(0.1, 0.1)
-            
-            UIView.animateWithDuration(2.0,
-                delay: 0,
-                usingSpringWithDamping: 0.2,
-                initialSpringVelocity: 9.0,
-                options: UIViewAnimationOptions.AllowUserInteraction,
-                animations: {
-                    self.fullImageViews[Int(self.rating)].transform = CGAffineTransformIdentity
-                }, completion: nil)
+            //Check if tapped image can bounce
+            if shouldBounce {
+                let imageViewIndex = self.rating - 1 <= 0 ? 0 : self.rating - 1
+                self.fullImageViews[Int(imageViewIndex)].transform = CGAffineTransformMakeScale(0.1, 0.1)
+                
+                UIView.animateWithDuration(2.0,
+                    delay: 0,
+                    usingSpringWithDamping: 0.2,
+                    initialSpringVelocity: 9.0,
+                    options: UIViewAnimationOptions.AllowUserInteraction,
+                    animations: {
+                        self.fullImageViews[Int(imageViewIndex)].transform = CGAffineTransformIdentity
+                    }, completion: nil)
+            }
         }
     }
     
