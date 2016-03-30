@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/garethpaul/iHeartRating.svg?branch=master)](https://travis-ci.org/garethpaul/iHeartRating)
 <img src="https://raw.github.com/garethpaul/iheartrating/master/assets/logo.png" width="90" alt="Logo" style="display:block; margin-left: auto; margin-right: auto; width:90px;" />
 
 # iHeartRating
