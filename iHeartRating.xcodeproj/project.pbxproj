@@ -7,11 +7,26 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7F4CF5D61D27597100D58750 /* iHeartRatingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F4CF5D51D27597100D58750 /* iHeartRatingTests.swift */; };
+		7F4CF5D81D27597100D58750 /* iHeartRating.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 888DBD391C3DEA5F00FBE6DA /* iHeartRating.framework */; };
 		888DBD3D1C3DEA5F00FBE6DA /* iHeartRating.h in Headers */ = {isa = PBXBuildFile; fileRef = 888DBD3C1C3DEA5F00FBE6DA /* iHeartRating.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		888DBD451C3DEAC200FBE6DA /* iHeartRatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 888DBD441C3DEAC200FBE6DA /* iHeartRatingView.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		7F4CF5D91D27597100D58750 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 888DBD301C3DEA5F00FBE6DA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 888DBD381C3DEA5F00FBE6DA;
+			remoteInfo = iHeartRating;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		7F4CF5D31D27597100D58750 /* iHeartRatingTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = iHeartRatingTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7F4CF5D51D27597100D58750 /* iHeartRatingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iHeartRatingTests.swift; sourceTree = "<group>"; };
+		7F4CF5D71D27597100D58750 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		888DBD391C3DEA5F00FBE6DA /* iHeartRating.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = iHeartRating.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		888DBD3C1C3DEA5F00FBE6DA /* iHeartRating.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = iHeartRating.h; sourceTree = "<group>"; };
 		888DBD3E1C3DEA5F00FBE6DA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -19,6 +34,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		7F4CF5D01D27597100D58750 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F4CF5D81D27597100D58750 /* iHeartRating.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		888DBD351C3DEA5F00FBE6DA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -29,10 +52,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		7F4CF5D41D27597100D58750 /* iHeartRatingTests */ = {
+			isa = PBXGroup;
+			children = (
+				7F4CF5D51D27597100D58750 /* iHeartRatingTests.swift */,
+				7F4CF5D71D27597100D58750 /* Info.plist */,
+			);
+			path = iHeartRatingTests;
+			sourceTree = "<group>";
+		};
 		888DBD2F1C3DEA5F00FBE6DA = {
 			isa = PBXGroup;
 			children = (
 				888DBD3B1C3DEA5F00FBE6DA /* iHeartRating */,
+				7F4CF5D41D27597100D58750 /* iHeartRatingTests */,
 				888DBD3A1C3DEA5F00FBE6DA /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				888DBD391C3DEA5F00FBE6DA /* iHeartRating.framework */,
+				7F4CF5D31D27597100D58750 /* iHeartRatingTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -69,6 +103,24 @@
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
+		7F4CF5D21D27597100D58750 /* iHeartRatingTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7F4CF5DD1D27597100D58750 /* Build configuration list for PBXNativeTarget "iHeartRatingTests" */;
+			buildPhases = (
+				7F4CF5CF1D27597100D58750 /* Sources */,
+				7F4CF5D01D27597100D58750 /* Frameworks */,
+				7F4CF5D11D27597100D58750 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7F4CF5DA1D27597100D58750 /* PBXTargetDependency */,
+			);
+			name = iHeartRatingTests;
+			productName = iHeartRatingTests;
+			productReference = 7F4CF5D31D27597100D58750 /* iHeartRatingTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		888DBD381C3DEA5F00FBE6DA /* iHeartRating */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 888DBD411C3DEA5F00FBE6DA /* Build configuration list for PBXNativeTarget "iHeartRating" */;
@@ -93,9 +145,13 @@
 		888DBD301C3DEA5F00FBE6DA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0730;
 				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = GPJ;
 				TargetAttributes = {
+					7F4CF5D21D27597100D58750 = {
+						CreatedOnToolsVersion = 7.3.1;
+					};
 					888DBD381C3DEA5F00FBE6DA = {
 						CreatedOnToolsVersion = 7.2;
 					};
@@ -114,11 +170,19 @@
 			projectRoot = "";
 			targets = (
 				888DBD381C3DEA5F00FBE6DA /* iHeartRating */,
+				7F4CF5D21D27597100D58750 /* iHeartRatingTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		7F4CF5D11D27597100D58750 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		888DBD371C3DEA5F00FBE6DA /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -129,6 +193,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		7F4CF5CF1D27597100D58750 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				7F4CF5D61D27597100D58750 /* iHeartRatingTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		888DBD341C3DEA5F00FBE6DA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -139,7 +211,41 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		7F4CF5DA1D27597100D58750 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 888DBD381C3DEA5F00FBE6DA /* iHeartRating */;
+			targetProxy = 7F4CF5D91D27597100D58750 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		7F4CF5DB1D27597100D58750 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				INFOPLIST_FILE = iHeartRatingTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gpj.iHeartRatingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		7F4CF5DC1D27597100D58750 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				INFOPLIST_FILE = iHeartRatingTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = com.gpj.iHeartRatingTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 		888DBD3F1C3DEA5F00FBE6DA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -267,6 +373,14 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		7F4CF5DD1D27597100D58750 /* Build configuration list for PBXNativeTarget "iHeartRatingTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7F4CF5DB1D27597100D58750 /* Debug */,
+				7F4CF5DC1D27597100D58750 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
 		888DBD331C3DEA5F00FBE6DA /* Build configuration list for PBXProject "iHeartRating" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -283,6 +397,7 @@
 				888DBD431C3DEA5F00FBE6DA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
