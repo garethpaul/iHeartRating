@@ -8,6 +8,8 @@
 
 import XCTest
 
+@testable import iHeartRating
+
 class iHeartRatingTests: XCTestCase {
     
     override func setUp() {
@@ -23,6 +25,9 @@ class iHeartRatingTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 1000, height: 1000))
+        XCTAssert(hrv.frame.height == 1000)
+        
     }
     
     func testPerformanceExample() {
