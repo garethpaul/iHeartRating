@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/garethpaul/iHeartRating.svg?branch=master)](https://travis-ci.org/garethpaul/iHeartRating)
-<img src="https://raw.github.com/garethpaul/iheartrating/master/assets/logo.png" width="90" alt="Logo" style="display:block; margin-left: auto; margin-right: auto; width:90px;" />
+
+<img src="https://raw.github.com/garethpaul/iheartrating/master/assets/logo.png" width="90" alt="Logo" style="display:block; width:90px;" />
 
 # iHeartRating
 Simple Ratings View for iOS enabling you to use any image as a rating e.g. hearts, stars, pigeons etc. We extend UIView to make it very easy to add ratings to your app
