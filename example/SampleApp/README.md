@@ -1,6 +1,9 @@
 
 ## Sample App ##
 ----------
+<img src="https://raw.githubusercontent.com/garethpaul/iHeartRating/master/screenshots/heart_app_example.gif" width="192" align="right">
+
+
 This should get you going quick simply.
 
 **Getting Started**
