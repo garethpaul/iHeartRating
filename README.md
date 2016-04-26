@@ -1,7 +1,9 @@
-<img src="https://raw.github.com/garethpaul/iheartrating/master/assets/logo.png" alt="Logo" style="display:block; margin-left: auto; margin-right: auto; width:190px;" />
+<img src="https://raw.github.com/garethpaul/iheartrating/master/assets/logo.png" alt="Logo" style="display:block; margin-left: auto; margin-right: auto; width:90px;" />
 
 # iHeartRating
 Simple Ratings View for iOS enabling you to use any image as a rating e.g. hearts, stars, pigeons etc. We extend UIView to make it very easy to add ratings to your app
+
+<img src="https://raw.githubusercontent.com/garethpaul/iHeartRating/master/screenshots/heart_app_example.gif" width="192">
 
 # Getting Started
 You want to add `pod 'iHeartRating', '~> 0.1'` to your Podfile:
