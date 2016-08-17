@@ -326,6 +326,9 @@ public class HeartRatingView: UIView {
         }
     }
     
+    //track animations in progress to make sure the final animation is the one to restore the empty image view's state
+    private var animationsInProgressCountForIndex: [Int: Int] = [:]
+    
     override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
         // Update delegate
         if let delegate = self.delegate {
@@ -337,20 +340,33 @@ public class HeartRatingView: UIView {
                 let imageViewIndex = Int(self.rating - 1 <= 0 ? 0 : self.rating - 1)
                 self.fullImageViews[imageViewIndex].transform = CGAffineTransformMakeScale(0.1, 0.1)
                 
-                let originalEmptyViewHiddenFlagValue = self.emptyImageViews[imageViewIndex].hidden
                 if shouldHideEmptyViewDuringBounce {
+                    //hide the appropriate empty image view
                     self.emptyImageViews[imageViewIndex].hidden = true
+                    
+                    //update animation in progress tracking (used to control when to restore the empty view)
+                    let currentCount = animationsInProgressCountForIndex[imageViewIndex] ?? 0
+                    animationsInProgressCountForIndex[imageViewIndex] = currentCount + 1
                 }
                 
                 UIView.animateWithDuration(2.0,
                     delay: 0,
                     usingSpringWithDamping: 0.2,
                     initialSpringVelocity: 9.0,
-                    options: UIViewAnimationOptions.AllowUserInteraction,
+                    options: [.AllowUserInteraction, .BeginFromCurrentState],
                     animations: {
                         self.fullImageViews[imageViewIndex].transform = CGAffineTransformIdentity
                 }) { _ in
-                    self.emptyImageViews[imageViewIndex].hidden = originalEmptyViewHiddenFlagValue
+                    
+                    //decrement the current count if we were tracking for this animation
+                    if let currentCount = self.animationsInProgressCountForIndex[imageViewIndex] {
+                        self.animationsInProgressCountForIndex[imageViewIndex] = currentCount - 1
+                    }
+                    
+                    //if there are no more animations in progress, restore the empty view
+                    if self.animationsInProgressCountForIndex[imageViewIndex] == 0 {
+                        self.emptyImageViews[imageViewIndex].hidden = false
+                    }
                 }
             }
         }
