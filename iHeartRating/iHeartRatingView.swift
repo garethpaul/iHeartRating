@@ -184,6 +184,16 @@ public class HeartRatingView: UIView {
                 imageView.hidden = true
             }
         }
+        
+        //also reset empty image views (as they may be hidden during a bounce animation)
+        for i in 0..<self.emptyImageViews.count {
+            
+            //only reset empty views above the current rating (the current value will be hidden when bounce animation finishes)
+            let indexAsFloat = Float(i + 1)
+            if self.rating < indexAsFloat {
+                self.emptyImageViews[i].hidden = false
+            }
+        }
     }
     
     // MARK: Layout helper classes
