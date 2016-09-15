@@ -154,6 +154,7 @@
 					};
 					888DBD381C3DEA5F00FBE6DA = {
 						CreatedOnToolsVersion = 7.2;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -350,6 +351,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -367,6 +369,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.gpj.iHeartRating;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -380,6 +383,7 @@
 				7F4CF5DC1D27597100D58750 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		888DBD331C3DEA5F00FBE6DA /* Build configuration list for PBXProject "iHeartRating" */ = {
 			isa = XCConfigurationList;
