@@ -28,7 +28,26 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7F4CF5D21D27597100D58750"
+               BuildableName = "iHeartRatingTests.xctest"
+               BlueprintName = "iHeartRatingTests"
+               ReferencedContainer = "container:iHeartRating.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "888DBD381C3DEA5F00FBE6DA"
+            BuildableName = "iHeartRating.framework"
+            BlueprintName = "iHeartRating"
+            ReferencedContainer = "container:iHeartRating.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <AdditionalOptions>
       </AdditionalOptions>
    </TestAction>
