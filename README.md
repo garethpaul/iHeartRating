@@ -3,6 +3,10 @@
 <img src="https://raw.github.com/garethpaul/iheartrating/master/assets/logo.png" width="90" alt="Logo" style="display:block; width:90px;" />
 
 # iHeartRating
+
+<!-- README-OVERVIEW-IMAGE -->
+![Project overview](docs/readme-overview.svg)
+
 Simple Ratings View for iOS enabling you to use any image as a rating e.g. hearts, stars, pigeons etc. We extend UIView to make it very easy to add ratings to your app
 
 <img src="https://raw.githubusercontent.com/garethpaul/iHeartRating/master/screenshots/heart_app_example.gif" width="192">
@@ -27,7 +31,6 @@ class ViewController: UIViewController, HeartRatingViewDelegate {
   override func viewDidLoad() {
         super.viewDidLoad()
   }
-
 
   func heartRatingView(ratingView: HeartRatingView, isUpdating rating:Float) {
       // do something while (rating) has been initiated
