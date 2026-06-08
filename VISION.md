@@ -37,7 +37,7 @@ Contribution rules:
 This UI component has low security risk, but it should not crash on malformed
 configuration or unexpected image assets.
 
-## What We Will Not Merge For Now
+## What We Will Not Merge (For Now)
 
 - Broad UI frameworks unrelated to rating controls
 - API-breaking changes without migration notes
