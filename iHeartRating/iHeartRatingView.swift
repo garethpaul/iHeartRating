@@ -87,6 +87,10 @@ public class HeartRatingView: UIView {
      */
     @IBInspectable public var maxRating: Int = 5 {
         didSet {
+            if maxRating < 1 {
+                maxRating = 1
+            }
+
             let needsRefresh = maxRating != oldValue
             
             if needsRefresh {

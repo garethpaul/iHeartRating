@@ -111,6 +111,13 @@ def main():
             failures)
 
     rating_view = read("iHeartRating/iHeartRatingView.swift")
+    tests = read("iHeartRatingTests/iHeartRatingTests.swift")
+    require(rating_view.count("let maxImageWidth =") == 1,
+            "layoutSubviews must declare maxImageWidth once",
+            failures)
+    require("if maxRating < 1" in rating_view and "maxRating = 1" in rating_view,
+            "maxRating must be clamped to a supported lower bound",
+            failures)
     require("if image.size.width <= 0 || image.size.height <= 0 || size.width <= 0 || size.height <= 0" in rating_view,
             "sizeForImage must guard zero-sized images and containers",
             failures)
@@ -128,6 +135,9 @@ def main():
             failures)
     require("shouldBounce && !self.fullImageViews.isEmpty" in rating_view and "min(max(rawImageViewIndex, 0), self.fullImageViews.count - 1)" in rating_view,
             "bounce handling must clamp the animated image index",
+            failures)
+    require("testMaxRatingDoesNotStayBelowOne" in tests and "testZeroSizeImageReturnsZeroSize" in tests,
+            "unit tests must cover maxRating lower bound and zero-size image handling",
             failures)
 
     root_podspec = read("iHeartRating.podspec")
@@ -159,7 +169,7 @@ def main():
     require("malformed configuration" in security and "make check" in security,
             "SECURITY must document configuration hardening and verification",
             failures)
-    require("zero-size" in changes and "podspec" in changes,
+    require("zero-size" in changes and "maxRating" in changes and "podspec" in changes,
             "CHANGES must record rating edge-case and podspec updates",
             failures)
     require("status: completed" in plan,

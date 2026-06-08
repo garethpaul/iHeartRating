@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import UIKit
 
 @testable import iHeartRating
 
@@ -28,6 +29,19 @@ class iHeartRatingTests: XCTestCase {
         let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 1000, height: 1000))
         XCTAssert(hrv.frame.height == 1000)
         
+    }
+
+    func testMaxRatingDoesNotStayBelowOne() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        hrv.maxRating = 0
+        XCTAssert(hrv.maxRating == 1)
+    }
+
+    func testZeroSizeImageReturnsZeroSize() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        let imageSize = hrv.sizeForImage(UIImage(), inSize: CGSizeZero)
+        XCTAssert(imageSize.width == 0)
+        XCTAssert(imageSize.height == 0)
     }
     
     func testPerformanceExample() {

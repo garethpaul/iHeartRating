@@ -48,7 +48,7 @@ configuration or unexpected image assets.
 Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
 It verifies static project metadata, CocoaPods specs, plist/storyboard files,
 build script syntax, and rating-view guards for empty, single-item, zero-size,
-and out-of-range bounce configurations.
+invalid `maxRating`, and out-of-range bounce configurations.
 
 ## What We Will Not Merge (For Now)
 
