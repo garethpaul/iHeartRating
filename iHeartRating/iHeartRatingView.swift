@@ -74,11 +74,14 @@ public class HeartRatingView: UIView {
      */
     @IBInspectable public var minRating: Int  = 0 {
         didSet {
-            // Update current rating if needed
-            if self.rating < Float(minRating) {
-                self.rating = Float(minRating)
-                self.refresh()
+            if minRating < 0 {
+                minRating = 0
             }
+            if minRating > maxRating {
+                minRating = maxRating
+            }
+
+            self.rating = self.boundedRating(self.rating)
         }
     }
     
@@ -90,6 +93,9 @@ public class HeartRatingView: UIView {
             if maxRating < 1 {
                 maxRating = 1
             }
+            if minRating > maxRating {
+                minRating = maxRating
+            }
 
             let needsRefresh = maxRating != oldValue
             
@@ -99,6 +105,7 @@ public class HeartRatingView: UIView {
                 
                 // Relayout and refresh
                 self.setNeedsLayout()
+                self.rating = self.boundedRating(self.rating)
                 self.refresh()
             }
         }
@@ -114,6 +121,10 @@ public class HeartRatingView: UIView {
      */
     @IBInspectable public var rating: Float = 0 {
         didSet {
+            let nextRating = self.boundedRating(self.rating)
+            if self.rating != nextRating {
+                self.rating = nextRating
+            }
             if rating != oldValue {
                 self.refresh()
             }
@@ -157,6 +168,10 @@ public class HeartRatingView: UIView {
     }
     
     // MARK: Refresh hides or shows full images
+
+    private func boundedRating(rating: Float) -> Float {
+        return min(max(rating, Float(self.minRating)), Float(self.maxRating))
+    }
     
     func refresh() {
         for i in 0..<self.fullImageViews.count {
@@ -314,8 +329,7 @@ public class HeartRatingView: UIView {
             }
         }
         
-        // Check min rating
-        self.rating = newRating < Float(self.minRating) ? Float(self.minRating):newRating
+        self.rating = self.boundedRating(newRating)
         
         // Update delegate
         if let delegate = self.delegate {

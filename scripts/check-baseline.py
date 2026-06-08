@@ -9,7 +9,8 @@ import xml.etree.ElementTree as ET
 
 
 ROOT = Path(__file__).resolve().parents[1]
-PLAN = ROOT / "docs/plans/2026-06-08-rating-baseline.md"
+BASELINE_PLAN = ROOT / "docs/plans/2026-06-08-rating-baseline.md"
+RATING_BOUNDS_PLAN = ROOT / "docs/plans/2026-06-08-rating-bounds.md"
 
 
 def require(condition, message, failures):
@@ -79,6 +80,7 @@ def main():
         "assets/storyboard.png",
         "docs/readme-overview.svg",
         "docs/plans/2026-06-08-rating-baseline.md",
+        "docs/plans/2026-06-08-rating-bounds.md",
     ]
 
     for relative_path in required_files:
@@ -118,6 +120,16 @@ def main():
     require("if maxRating < 1" in rating_view and "maxRating = 1" in rating_view,
             "maxRating must be clamped to a supported lower bound",
             failures)
+    require("private func boundedRating" in rating_view and
+            "return min(max(rating, Float(self.minRating)), Float(self.maxRating))" in rating_view,
+            "rating assignments must be bounded by minRating and maxRating",
+            failures)
+    require("if minRating < 0" in rating_view and "if minRating > maxRating" in rating_view,
+            "minRating must stay non-negative and not exceed maxRating",
+            failures)
+    require("self.rating = self.boundedRating(newRating)" in rating_view,
+            "touch handling must reuse bounded rating normalization",
+            failures)
     require("if image.size.width <= 0 || image.size.height <= 0 || size.width <= 0 || size.height <= 0" in rating_view,
             "sizeForImage must guard zero-sized images and containers",
             failures)
@@ -136,8 +148,9 @@ def main():
     require("shouldBounce && !self.fullImageViews.isEmpty" in rating_view and "min(max(rawImageViewIndex, 0), self.fullImageViews.count - 1)" in rating_view,
             "bounce handling must clamp the animated image index",
             failures)
-    require("testMaxRatingDoesNotStayBelowOne" in tests and "testZeroSizeImageReturnsZeroSize" in tests,
-            "unit tests must cover maxRating lower bound and zero-size image handling",
+    require("testMaxRatingDoesNotStayBelowOne" in tests and "testZeroSizeImageReturnsZeroSize" in tests and
+            "testRatingDoesNotExceedMaxRating" in tests and "testMinRatingDoesNotExceedMaxRating" in tests,
+            "unit tests must cover rating bounds, maxRating lower bound, and zero-size image handling",
             failures)
 
     root_podspec = read("iHeartRating.podspec")
@@ -159,7 +172,8 @@ def main():
     vision = read("VISION.md")
     security = read("SECURITY.md")
     changes = read("CHANGES.md")
-    plan = PLAN.read_text(encoding="utf-8") if PLAN.exists() else ""
+    baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
+    rating_bounds_plan = RATING_BOUNDS_PLAN.read_text(encoding="utf-8") if RATING_BOUNDS_PLAN.exists() else ""
     require("make check" in readme and "build.sh" in readme and "podspec" in readme,
             "README must document static verification, build script, and podspec expectations",
             failures)
@@ -169,11 +183,11 @@ def main():
     require("malformed configuration" in security and "make check" in security,
             "SECURITY must document configuration hardening and verification",
             failures)
-    require("zero-size" in changes and "maxRating" in changes and "podspec" in changes,
-            "CHANGES must record rating edge-case and podspec updates",
+    require("zero-size" in changes and "maxRating" in changes and "podspec" in changes and "rating bounds" in changes,
+            "CHANGES must record rating edge-case, rating bounds, and podspec updates",
             failures)
-    require("status: completed" in plan,
-            "plan must be marked completed",
+    require("status: completed" in baseline_plan and "status: completed" in rating_bounds_plan,
+            "plans must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):

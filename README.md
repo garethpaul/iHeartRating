@@ -63,7 +63,7 @@ Run the local static baseline:
 make check
 ```
 
-The baseline parses plist/storyboard/SVG files, validates both podspecs, checks `build.sh` shell syntax, verifies rating-view guards for empty, single-item, zero-size, invalid `maxRating`, and out-of-range bounce configurations, and reports when Xcode is unavailable.
+The baseline parses plist/storyboard/SVG files, validates both podspecs, checks `build.sh` shell syntax, verifies rating-view guards for empty, single-item, zero-size, invalid `maxRating`, rating bounds, and out-of-range bounce configurations, and reports when Xcode is unavailable.
 
 For full legacy verification on macOS, use Xcode's test action, `xcodebuild test`, or `./build.sh` with the appropriate scheme and destination.
 
@@ -78,7 +78,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Review changes touching network requests, sockets, or service endpoints; examples from the scan include example/SampleApp/SampleApp/Info.plist, example/SampleApp/SampleAppTests/Info.plist, example/SampleApp/SampleAppUITests/Info.plist, iHeartRating/Info.plist, and 1 more.
 - Review changes touching mobile permissions or privacy-sensitive device data; examples from the scan include iHeartRating/iHeartRatingView.swift.
 - Review changes touching file, media, JSON, XML, CSV, OCR, or data parsing; examples from the scan include example/SampleApp/SampleApp/Info.plist, example/SampleApp/SampleAppTests/Info.plist, example/SampleApp/SampleAppUITests/Info.plist, iHeartRating/Info.plist, and 2 more.
-- UI configuration changes should not crash on empty image arrays, single-rating views, zero-sized images, invalid `maxRating`, or out-of-range ratings.
+- UI configuration changes should not crash on empty image arrays, single-rating views, zero-sized images, invalid `maxRating`, inconsistent rating bounds, or out-of-range ratings.
 
 ## Maintenance Notes
 
