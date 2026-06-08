@@ -29,12 +29,12 @@ class ViewController: UIViewController, HeartRatingViewDelegate {
   }
 
 
-  func heartRatingView(ratingView: HeartRatingView, isUpdating rating:Float) {
+  func heartRatingView(_ ratingView: HeartRatingView, isUpdating rating: Float) {
       // do something while (rating) has been initiated
   }
 
-  func heartRatingView(ratingView: HeartRatingView, didUpdate rating: Float) {
-      // do something when (rating) object has been updates
+  func heartRatingView(_ ratingView: HeartRatingView, didUpdate rating: Float) {
+      // do something when the rating object has been updated
   }
 
 }

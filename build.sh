@@ -2,7 +2,7 @@
 
 set -eu
 
-function ci_lib() {
+ci_lib() {
     NAME=$1
     xcodebuild -project iHeartRating.xcodeproj \
                -scheme "iHeartRatingTests" \

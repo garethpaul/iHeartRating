@@ -90,6 +90,7 @@ Pod::Spec.new do |s|
   #
 
   s.source_files = "iHeartRating/*.{swift}"
+  s.pod_target_xcconfig = { "SWIFT_VERSION" => "3.0" }
   #s.exclude_files = "Classes/Exclude"
 
   # s.public_header_files = "Classes/**/*.h"
