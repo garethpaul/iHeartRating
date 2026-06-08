@@ -1,5 +1,8 @@
 ## iHeartRating Vision
 
+This document explains the current state and direction of the project.
+Project overview and developer docs: [`README.md`](README.md)
+
 iHeartRating is an iOS rating view library that lets apps use custom images for
 rating controls.
 
