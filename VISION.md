@@ -38,7 +38,6 @@ Canonical security policy and reporting:
 
 - [`SECURITY.md`](SECURITY.md)
 
-
 This UI component has low security risk, but it should not crash on malformed
 configuration or unexpected image assets.
 
