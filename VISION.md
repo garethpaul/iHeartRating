@@ -43,3 +43,6 @@ configuration or unexpected image assets.
 - API-breaking changes without migration notes
 - Package metadata changes without verification
 - Behavior changes without tests or sample updates
+
+This list is a roadmap guardrail, not a permanent rule.
+Strong user demand and strong technical rationale can change it.
