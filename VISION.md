@@ -20,10 +20,11 @@ Priority:
 - Keep delegate callbacks for updating and completed rating changes clear
 - Maintain podspec and sample app alignment
 - Avoid growing the library beyond focused rating behavior
+- Keep `scripts/check-baseline.py` passing for rating-view edge cases,
+  podspec metadata, project files, and build-script syntax
 
 Next priorities:
 
-- Document supported rating ranges, half-step behavior, and customization options
 - Modernize Swift/project settings in a dedicated pass
 - Add tests for rating calculations and delegate calls
 - Clarify package-manager support if revived
@@ -43,6 +44,11 @@ Canonical security policy and reporting:
 
 This UI component has low security risk, but it should not crash on malformed
 configuration or unexpected image assets.
+
+Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
+It verifies static project metadata, CocoaPods specs, plist/storyboard files,
+build script syntax, and rating-view guards for empty, single-item, zero-size,
+and out-of-range bounce configurations.
 
 ## What We Will Not Merge (For Now)
 

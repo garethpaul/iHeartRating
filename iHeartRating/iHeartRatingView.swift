@@ -185,6 +185,10 @@ public class HeartRatingView: UIView {
     
     // Calculates the ideal ImageView size in a given CGSize
     func sizeForImage(image: UIImage, inSize size:CGSize) -> CGSize {
+        if image.size.width <= 0 || image.size.height <= 0 || size.width <= 0 || size.height <= 0 {
+            return CGSizeZero
+        }
+
         let imageRatio = image.size.width / image.size.height
         let viewRatio = size.width / size.height
         
@@ -207,14 +211,19 @@ public class HeartRatingView: UIView {
         super.layoutSubviews()
         
         if let emptyImage = self.emptyImage {
-            let desiredImageWidth = self.frame.size.width / CGFloat(self.emptyImageViews.count)
+            let imageCount = self.emptyImageViews.count
+            if imageCount == 0 {
+                return
+            }
+
+            let desiredImageWidth = self.frame.size.width / CGFloat(imageCount)
             let maxImageWidth = max(self.minImageSize.width, desiredImageWidth)
             let maxImageHeight = max(self.minImageSize.height, self.frame.size.height)
             let imageViewSize = self.sizeForImage(emptyImage, inSize: CGSizeMake(maxImageWidth, maxImageHeight))
-            let imageXOffset = (self.frame.size.width - (imageViewSize.width * CGFloat(self.emptyImageViews.count))) /
-                CGFloat((self.emptyImageViews.count - 1))
+            let imageXOffset = imageCount > 1 ?
+                (self.frame.size.width - (imageViewSize.width * CGFloat(imageCount))) / CGFloat(imageCount - 1) : 0
             
-            for i in 0..<self.maxRating {
+            for i in 0..<imageCount {
                 let imageFrame = CGRectMake(i==0 ? 0:CGFloat(i)*(imageXOffset+imageViewSize.width), 0, imageViewSize.width, imageViewSize.height)
                 
                 var imageView = self.emptyImageViews[i]
@@ -270,14 +279,17 @@ public class HeartRatingView: UIView {
         if !self.editable {
             return
         }
+        if self.emptyImageViews.isEmpty {
+            return
+        }
         
         var newRating: Float = 0
-        for i in (self.maxRating-1).stride(through: 0, by: -1) {
+        for i in (self.emptyImageViews.count-1).stride(through: 0, by: -1) {
             let imageView = self.emptyImageViews[i]
-            
-            
-            
-            
+            if imageView.frame.size.width <= 0 {
+                continue
+            }
+
             if touchLocation.x > imageView.frame.origin.x {
                 // Find touch point in image view
                 let newLocation = imageView.convertPoint(touchLocation, fromView:self)
@@ -328,9 +340,10 @@ public class HeartRatingView: UIView {
             delegate.heartRatingView(self, didUpdate: self.rating)
             
             //Check if tapped image can bounce
-            if shouldBounce {
-                let imageViewIndex = self.rating - 1 <= 0 ? 0 : self.rating - 1
-                self.fullImageViews[Int(imageViewIndex)].transform = CGAffineTransformMakeScale(0.1, 0.1)
+            if shouldBounce && !self.fullImageViews.isEmpty {
+                let rawImageViewIndex = Int(self.rating - 1 <= 0 ? 0 : self.rating - 1)
+                let imageViewIndex = min(max(rawImageViewIndex, 0), self.fullImageViews.count - 1)
+                self.fullImageViews[imageViewIndex].transform = CGAffineTransformMakeScale(0.1, 0.1)
                 
                 UIView.animateWithDuration(2.0,
                     delay: 0,
@@ -338,7 +351,7 @@ public class HeartRatingView: UIView {
                     initialSpringVelocity: 9.0,
                     options: UIViewAnimationOptions.AllowUserInteraction,
                     animations: {
-                        self.fullImageViews[Int(imageViewIndex)].transform = CGAffineTransformIdentity
+                        self.fullImageViews[imageViewIndex].transform = CGAffineTransformIdentity
                     }, completion: nil)
             }
         }
