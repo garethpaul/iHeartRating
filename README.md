@@ -78,4 +78,4 @@ Keep changes small and tied to the project that is already present in this repos
 
 Prior README summary:
 
-> [![Build Status](https://travis-ci.org/garethpaul/iHeartRating.svg?branch=master)](https://travis-ci.org/garethpaul/iHeartRating) iHeartRating <!-- README-OVERVIEW-IMAGE --> Simple Ratings View for iOS enabling you to use any image as a rating e.g. hearts, stars, pigeons etc. We extend UIView to make it very easy to add ratings to your app Getting Started You want to add `pod 'iHeartRating', '~> 0.1'` to your Podfile:
+> [![Build Status](https://travis-ci.org/garethpaul/iHeartRating.svg?branch=master)](https://travis-ci.org/garethpaul/iHeartRating) iHeartRating Simple Ratings View for iOS enabling you to use any image as a rating e.g. hearts, stars, pigeons etc. We extend UIView to make it very easy to add ratings to your app Getting Started You want to add `pod 'iHeartRating', '~> 0.1'` to your Podfile:
