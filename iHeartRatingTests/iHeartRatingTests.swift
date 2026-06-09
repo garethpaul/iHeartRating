@@ -13,9 +13,14 @@ import UIKit
 
 class RecordingHeartRatingDelegate: NSObject, HeartRatingViewDelegate {
     var didUpdateCount = 0
+    var isUpdatingCount = 0
 
     func heartRatingView(ratingView: HeartRatingView, didUpdate rating: Float) {
         didUpdateCount += 1
+    }
+
+    func heartRatingView(ratingView: HeartRatingView, isUpdating rating: Float) {
+        isUpdatingCount += 1
     }
 }
 
@@ -93,6 +98,26 @@ class iHeartRatingTests: XCTestCase {
         hrv.touchesEnded(Set<UITouch>(), withEvent: nil)
 
         XCTAssert(delegate.didUpdateCount == 0)
+    }
+
+    func testTouchesBeganDoesNotNotifyWithoutTouches() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        let delegate = RecordingHeartRatingDelegate()
+        hrv.delegate = delegate
+
+        hrv.touchesBegan(Set<UITouch>(), withEvent: nil)
+
+        XCTAssert(delegate.isUpdatingCount == 0)
+    }
+
+    func testTouchesMovedDoesNotNotifyWithoutTouches() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        let delegate = RecordingHeartRatingDelegate()
+        hrv.delegate = delegate
+
+        hrv.touchesMoved(Set<UITouch>(), withEvent: nil)
+
+        XCTAssert(delegate.isUpdatingCount == 0)
     }
     
     func testPerformanceExample() {

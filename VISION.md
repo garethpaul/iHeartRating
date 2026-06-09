@@ -52,7 +52,8 @@ build script syntax, and rating-view guards for empty, single-item, zero-size,
 negative `minImageSize`, invalid `maxRating`, inconsistent rating bounds, and
 out-of-range bounce configurations. Bounce animation should remain independent
 of delegate callbacks, and non-editable views or empty touch endings should
-ignore touch-ending delegate and bounce work.
+ignore touch-ending delegate and bounce work. Empty began/moved touch events
+should ignore live-update delegate work.
 
 ## What We Will Not Merge (For Now)
 

@@ -365,6 +365,10 @@ public class HeartRatingView: UIView {
     }
     
     override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if touches.isEmpty {
+            return
+        }
+
         if let touch = touches.first {
             let touchLocation = touch.locationInView(self)
             self.handleTouchAtLocation(touchLocation)
@@ -372,6 +376,10 @@ public class HeartRatingView: UIView {
     }
     
     override public func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if touches.isEmpty {
+            return
+        }
+
         if let touch = touches.first  {
             let touchLocation = touch.locationInView(self)
             self.handleTouchAtLocation(touchLocation)

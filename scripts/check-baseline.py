@@ -15,6 +15,7 @@ BOUNCE_PLAN = ROOT / "docs/plans/2026-06-08-bounce-without-delegate.md"
 NONEDITABLE_PLAN = ROOT / "docs/plans/2026-06-09-noneditable-touch-end.md"
 EMPTY_TOUCH_PLAN = ROOT / "docs/plans/2026-06-09-empty-touch-end.md"
 MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-09-min-image-size-guard.md"
+EMPTY_TOUCH_PHASE_PLAN = ROOT / "docs/plans/2026-06-09-empty-touch-phase-guard.md"
 
 
 def require(condition, message, failures):
@@ -89,6 +90,7 @@ def main():
         "docs/plans/2026-06-09-noneditable-touch-end.md",
         "docs/plans/2026-06-09-empty-touch-end.md",
         "docs/plans/2026-06-09-min-image-size-guard.md",
+        "docs/plans/2026-06-09-empty-touch-phase-guard.md",
     ]
 
     for relative_path in required_files:
@@ -167,13 +169,18 @@ def main():
             "touch handling must ignore touchesEnded when the view is not editable",
             failures)
     require("if touches.isEmpty" in rating_view,
-            "touchesEnded must ignore empty touch sets before delegate and bounce work",
+            "touch handlers must ignore empty touch sets before delegate and bounce work",
+            failures)
+    require(rating_view.count("if touches.isEmpty") >= 3,
+            "touchesBegan, touchesMoved, and touchesEnded must all guard empty touch sets",
             failures)
     require("testMaxRatingDoesNotStayBelowOne" in tests and "testZeroSizeImageReturnsZeroSize" in tests and
             "testRatingDoesNotExceedMaxRating" in tests and "testMinRatingDoesNotExceedMaxRating" in tests and
             "testMinImageSizeDoesNotStayNegative" in tests and
             "testTouchesEndedDoesNotNotifyWhenNotEditable" in tests and
-            "testTouchesEndedDoesNotNotifyWithoutTouches" in tests,
+            "testTouchesEndedDoesNotNotifyWithoutTouches" in tests and
+            "testTouchesBeganDoesNotNotifyWithoutTouches" in tests and
+            "testTouchesMovedDoesNotNotifyWithoutTouches" in tests,
             "unit tests must cover rating bounds, maxRating lower bound, zero-size image handling, and touch-end guards",
             failures)
 
@@ -202,10 +209,14 @@ def main():
     noneditable_plan = NONEDITABLE_PLAN.read_text(encoding="utf-8") if NONEDITABLE_PLAN.exists() else ""
     empty_touch_plan = EMPTY_TOUCH_PLAN.read_text(encoding="utf-8") if EMPTY_TOUCH_PLAN.exists() else ""
     min_image_size_plan = MIN_IMAGE_SIZE_PLAN.read_text(encoding="utf-8") if MIN_IMAGE_SIZE_PLAN.exists() else ""
+    empty_touch_phase_plan = EMPTY_TOUCH_PHASE_PLAN.read_text(encoding="utf-8") if EMPTY_TOUCH_PHASE_PLAN.exists() else ""
     require("make check" in readme and "build.sh" in readme and "podspec" in readme and "delegate-independent bounce" in readme and "non-editable" in readme and "empty touch" in readme.lower() and "minImageSize" in readme,
             "README must document static verification, build script, and podspec expectations",
             failures)
-    require("scripts/check-baseline.py" in vision and "rating" in vision.lower() and "bounce" in vision.lower() and "non-editable" in vision.lower() and "empty touch" in vision.lower() and "minImageSize" in vision,
+    require("empty began/moved touch" in readme,
+            "README must document empty began/moved touch guards",
+            failures)
+    require("scripts/check-baseline.py" in vision and "rating" in vision.lower() and "bounce" in vision.lower() and "non-editable" in vision.lower() and "empty touch" in vision.lower() and "empty began/moved touch" in vision.lower() and "minImageSize" in vision,
             "VISION must describe baseline validation for rating behavior",
             failures)
     require("malformed configuration" in security and "make check" in security and "non-editable" in security and "empty touch" in security.lower() and "minImageSize" in security,
@@ -213,6 +224,9 @@ def main():
             failures)
     require("zero-size" in changes and "maxRating" in changes and "podspec" in changes and "rating bounds" in changes and "bounce" in changes and "not editable" in changes and "empty touch" in changes.lower() and "minImageSize" in changes,
             "CHANGES must record rating edge-case, rating bounds, and podspec updates",
+            failures)
+    require("empty began/moved touch" in changes,
+            "CHANGES must record empty began/moved touch guards",
             failures)
     require("status: completed" in baseline_plan and "status: completed" in rating_bounds_plan and "status: completed" in bounce_plan,
             "plans must be marked completed",
@@ -225,6 +239,9 @@ def main():
             failures)
     require("status: completed" in min_image_size_plan,
             "min image size plan must be marked completed",
+            failures)
+    require("status: completed" in empty_touch_phase_plan,
+            "empty touch phase plan must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):

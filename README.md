@@ -63,7 +63,7 @@ Run the local static baseline:
 make check
 ```
 
-The baseline parses plist/storyboard/SVG files, validates both podspecs, checks `build.sh` shell syntax, verifies rating-view guards for empty, single-item, zero-size, negative `minImageSize`, invalid `maxRating`, rating bounds, non-editable touch endings, empty touch endings, out-of-range bounce configurations, and delegate-independent bounce behavior, and reports when Xcode is unavailable.
+The baseline parses plist/storyboard/SVG files, validates both podspecs, checks `build.sh` shell syntax, verifies rating-view guards for empty, single-item, zero-size, negative `minImageSize`, invalid `maxRating`, rating bounds, non-editable touch endings, empty touch endings, empty began/moved touch events, out-of-range bounce configurations, and delegate-independent bounce behavior, and reports when Xcode is unavailable.
 
 For full legacy verification on macOS, use Xcode's test action, `xcodebuild test`, or `./build.sh` with the appropriate scheme and destination.
 
@@ -88,6 +88,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-08-bounce-without-delegate.md` for the bounce-without-delegate guardrail.
 - See `docs/plans/2026-06-09-noneditable-touch-end.md` for the non-editable touch-ending guardrail.
 - See `docs/plans/2026-06-09-empty-touch-end.md` for the empty touch-ending guardrail.
+- See `docs/plans/2026-06-09-empty-touch-phase-guard.md` for the empty
+  began/moved touch guardrail.
 - See `docs/plans/2026-06-09-min-image-size-guard.md` for the `minImageSize` lower-bound guardrail.
 - Run `make check` before pushing changes to Swift sources, podspecs, plist/storyboard files, or build scripts.
 
