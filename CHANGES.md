@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-09
+
+- Guarded `touchesEnded` when the rating view is not editable so disabled
+  controls do not send delegate updates or run bounce animations.
+
 ## 2026-06-08
 
 - Added `make check` and a static baseline for project metadata, podspecs, plist/storyboard files, and rating-view guardrails.

@@ -11,6 +11,14 @@ import UIKit
 
 @testable import iHeartRating
 
+class RecordingHeartRatingDelegate: NSObject, HeartRatingViewDelegate {
+    var didUpdateCount = 0
+
+    func heartRatingView(ratingView: HeartRatingView, didUpdate rating: Float) {
+        didUpdateCount += 1
+    }
+}
+
 class iHeartRatingTests: XCTestCase {
     
     override func setUp() {
@@ -57,6 +65,17 @@ class iHeartRatingTests: XCTestCase {
         let imageSize = hrv.sizeForImage(UIImage(), inSize: CGSizeZero)
         XCTAssert(imageSize.width == 0)
         XCTAssert(imageSize.height == 0)
+    }
+
+    func testTouchesEndedDoesNotNotifyWhenNotEditable() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        let delegate = RecordingHeartRatingDelegate()
+        hrv.delegate = delegate
+        hrv.editable = false
+
+        hrv.touchesEnded(Set<UITouch>(), withEvent: nil)
+
+        XCTAssert(delegate.didUpdateCount == 0)
     }
     
     func testPerformanceExample() {

@@ -63,7 +63,7 @@ Run the local static baseline:
 make check
 ```
 
-The baseline parses plist/storyboard/SVG files, validates both podspecs, checks `build.sh` shell syntax, verifies rating-view guards for empty, single-item, zero-size, invalid `maxRating`, rating bounds, out-of-range bounce configurations, and delegate-independent bounce behavior, and reports when Xcode is unavailable.
+The baseline parses plist/storyboard/SVG files, validates both podspecs, checks `build.sh` shell syntax, verifies rating-view guards for empty, single-item, zero-size, invalid `maxRating`, rating bounds, non-editable touch endings, out-of-range bounce configurations, and delegate-independent bounce behavior, and reports when Xcode is unavailable.
 
 For full legacy verification on macOS, use Xcode's test action, `xcodebuild test`, or `./build.sh` with the appropriate scheme and destination.
 
@@ -86,6 +86,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
 - See `docs/plans/2026-06-08-bounce-without-delegate.md` for the bounce-without-delegate guardrail.
+- See `docs/plans/2026-06-09-noneditable-touch-end.md` for the non-editable touch-ending guardrail.
 - Run `make check` before pushing changes to Swift sources, podspecs, plist/storyboard files, or build scripts.
 
 ## Contributing

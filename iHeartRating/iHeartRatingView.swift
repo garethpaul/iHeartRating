@@ -369,6 +369,10 @@ public class HeartRatingView: UIView {
     }
     
     override public func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if !self.editable {
+            return
+        }
+
         // Update delegate
         if let delegate = self.delegate {
             

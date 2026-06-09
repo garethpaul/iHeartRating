@@ -12,6 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 BASELINE_PLAN = ROOT / "docs/plans/2026-06-08-rating-baseline.md"
 RATING_BOUNDS_PLAN = ROOT / "docs/plans/2026-06-08-rating-bounds.md"
 BOUNCE_PLAN = ROOT / "docs/plans/2026-06-08-bounce-without-delegate.md"
+NONEDITABLE_PLAN = ROOT / "docs/plans/2026-06-09-noneditable-touch-end.md"
 
 
 def require(condition, message, failures):
@@ -83,6 +84,7 @@ def main():
         "docs/plans/2026-06-08-rating-baseline.md",
         "docs/plans/2026-06-08-rating-bounds.md",
         "docs/plans/2026-06-08-bounce-without-delegate.md",
+        "docs/plans/2026-06-09-noneditable-touch-end.md",
     ]
 
     for relative_path in required_files:
@@ -153,8 +155,12 @@ def main():
     require("private func bounceImageForCurrentRating()" in rating_view and "self.bounceImageForCurrentRating()" in rating_view,
             "bounce handling must run independently of delegate callbacks",
             failures)
+    require(rating_view.count("if !self.editable") >= 2,
+            "touch handling must ignore touchesEnded when the view is not editable",
+            failures)
     require("testMaxRatingDoesNotStayBelowOne" in tests and "testZeroSizeImageReturnsZeroSize" in tests and
-            "testRatingDoesNotExceedMaxRating" in tests and "testMinRatingDoesNotExceedMaxRating" in tests,
+            "testRatingDoesNotExceedMaxRating" in tests and "testMinRatingDoesNotExceedMaxRating" in tests and
+            "testTouchesEndedDoesNotNotifyWhenNotEditable" in tests,
             "unit tests must cover rating bounds, maxRating lower bound, and zero-size image handling",
             failures)
 
@@ -180,20 +186,24 @@ def main():
     baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
     rating_bounds_plan = RATING_BOUNDS_PLAN.read_text(encoding="utf-8") if RATING_BOUNDS_PLAN.exists() else ""
     bounce_plan = BOUNCE_PLAN.read_text(encoding="utf-8") if BOUNCE_PLAN.exists() else ""
-    require("make check" in readme and "build.sh" in readme and "podspec" in readme and "delegate-independent bounce" in readme,
+    noneditable_plan = NONEDITABLE_PLAN.read_text(encoding="utf-8") if NONEDITABLE_PLAN.exists() else ""
+    require("make check" in readme and "build.sh" in readme and "podspec" in readme and "delegate-independent bounce" in readme and "non-editable" in readme,
             "README must document static verification, build script, and podspec expectations",
             failures)
-    require("scripts/check-baseline.py" in vision and "rating" in vision.lower() and "bounce" in vision.lower(),
+    require("scripts/check-baseline.py" in vision and "rating" in vision.lower() and "bounce" in vision.lower() and "non-editable" in vision.lower(),
             "VISION must describe baseline validation for rating behavior",
             failures)
-    require("malformed configuration" in security and "make check" in security,
+    require("malformed configuration" in security and "make check" in security and "non-editable" in security,
             "SECURITY must document configuration hardening and verification",
             failures)
-    require("zero-size" in changes and "maxRating" in changes and "podspec" in changes and "rating bounds" in changes and "bounce" in changes,
+    require("zero-size" in changes and "maxRating" in changes and "podspec" in changes and "rating bounds" in changes and "bounce" in changes and "not editable" in changes,
             "CHANGES must record rating edge-case, rating bounds, and podspec updates",
             failures)
     require("status: completed" in baseline_plan and "status: completed" in rating_bounds_plan and "status: completed" in bounce_plan,
             "plans must be marked completed",
+            failures)
+    require("status: completed" in noneditable_plan,
+            "non-editable touch-end plan must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):
