@@ -290,6 +290,23 @@ public class HeartRatingView: UIView {
             self.addSubview(fullImageView)
         }
     }
+
+    private func bounceImageForCurrentRating() {
+        if shouldBounce && !self.fullImageViews.isEmpty {
+            let rawImageViewIndex = Int(self.rating - 1 <= 0 ? 0 : self.rating - 1)
+            let imageViewIndex = min(max(rawImageViewIndex, 0), self.fullImageViews.count - 1)
+            self.fullImageViews[imageViewIndex].transform = CGAffineTransformMakeScale(0.1, 0.1)
+
+            UIView.animateWithDuration(2.0,
+                delay: 0,
+                usingSpringWithDamping: 0.2,
+                initialSpringVelocity: 9.0,
+                options: UIViewAnimationOptions.AllowUserInteraction,
+                animations: {
+                    self.fullImageViews[imageViewIndex].transform = CGAffineTransformIdentity
+                }, completion: nil)
+        }
+    }
     
     // MARK: Touch events
     
@@ -356,23 +373,9 @@ public class HeartRatingView: UIView {
         if let delegate = self.delegate {
             
             delegate.heartRatingView(self, didUpdate: self.rating)
-            
-            //Check if tapped image can bounce
-            if shouldBounce && !self.fullImageViews.isEmpty {
-                let rawImageViewIndex = Int(self.rating - 1 <= 0 ? 0 : self.rating - 1)
-                let imageViewIndex = min(max(rawImageViewIndex, 0), self.fullImageViews.count - 1)
-                self.fullImageViews[imageViewIndex].transform = CGAffineTransformMakeScale(0.1, 0.1)
-                
-                UIView.animateWithDuration(2.0,
-                    delay: 0,
-                    usingSpringWithDamping: 0.2,
-                    initialSpringVelocity: 9.0,
-                    options: UIViewAnimationOptions.AllowUserInteraction,
-                    animations: {
-                        self.fullImageViews[imageViewIndex].transform = CGAffineTransformIdentity
-                    }, completion: nil)
-            }
         }
+
+        self.bounceImageForCurrentRating()
     }
     
 }
