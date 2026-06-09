@@ -4,6 +4,8 @@
 
 - Guarded `touchesEnded` when the rating view is not editable so disabled
   controls do not send delegate updates or run bounce animations.
+- Guarded empty touch-ending events so they do not send delegate updates or run
+  bounce animations.
 
 ## 2026-06-08
 

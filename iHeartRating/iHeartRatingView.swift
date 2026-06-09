@@ -372,6 +372,9 @@ public class HeartRatingView: UIView {
         if !self.editable {
             return
         }
+        if touches.isEmpty {
+            return
+        }
 
         // Update delegate
         if let delegate = self.delegate {

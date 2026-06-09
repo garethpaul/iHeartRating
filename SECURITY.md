@@ -30,7 +30,7 @@ Helpful reports include:
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
 - `make check` runs a static baseline for malformed configuration hardening, CocoaPods metadata, plist/storyboard parsing, build-script syntax, rating bounds, and rating-view edge cases when Xcode is unavailable.
-- Rating controls should not crash on empty image arrays, single-rating views, zero-sized images, invalid `maxRating`, inconsistent rating bounds, out-of-range ratings, non-editable touch endings, or unexpected image assets.
+- Rating controls should not crash on empty image arrays, single-rating views, zero-sized images, invalid `maxRating`, inconsistent rating bounds, out-of-range ratings, non-editable touch endings, empty touch endings, or unexpected image assets.
 
 ## Mobile Privacy Notes
 

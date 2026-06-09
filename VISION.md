@@ -51,8 +51,8 @@ It verifies static project metadata, CocoaPods specs, plist/storyboard files,
 build script syntax, and rating-view guards for empty, single-item, zero-size,
 invalid `maxRating`, inconsistent rating bounds, and out-of-range bounce
 configurations. Bounce animation should remain independent of delegate
-callbacks, and non-editable views should ignore touch-ending delegate and bounce
-work.
+callbacks, and non-editable views or empty touch endings should ignore
+touch-ending delegate and bounce work.
 
 ## What We Will Not Merge (For Now)
 

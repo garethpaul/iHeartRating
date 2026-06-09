@@ -77,6 +77,16 @@ class iHeartRatingTests: XCTestCase {
 
         XCTAssert(delegate.didUpdateCount == 0)
     }
+
+    func testTouchesEndedDoesNotNotifyWithoutTouches() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        let delegate = RecordingHeartRatingDelegate()
+        hrv.delegate = delegate
+
+        hrv.touchesEnded(Set<UITouch>(), withEvent: nil)
+
+        XCTAssert(delegate.didUpdateCount == 0)
+    }
     
     func testPerformanceExample() {
         // This is an example of a performance test case.
