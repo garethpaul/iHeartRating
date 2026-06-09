@@ -17,6 +17,7 @@ NONEDITABLE_PLAN = ROOT / "docs/plans/2026-06-09-noneditable-touch-end.md"
 EMPTY_TOUCH_PLAN = ROOT / "docs/plans/2026-06-09-empty-touch-end.md"
 MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-09-min-image-size-guard.md"
 EMPTY_TOUCH_PHASE_PLAN = ROOT / "docs/plans/2026-06-09-empty-touch-phase-guard.md"
+NONEDITABLE_TOUCH_PHASE_PLAN = ROOT / "docs/plans/2026-06-09-noneditable-touch-phase-guard.md"
 
 
 def require(condition, message, failures):
@@ -93,6 +94,7 @@ def main():
         "docs/plans/2026-06-09-empty-touch-end.md",
         "docs/plans/2026-06-09-min-image-size-guard.md",
         "docs/plans/2026-06-09-empty-touch-phase-guard.md",
+        "docs/plans/2026-06-09-noneditable-touch-phase-guard.md",
     ]
 
     for relative_path in required_files:
@@ -167,8 +169,8 @@ def main():
     require("private func bounceImageForCurrentRating()" in rating_view and "self.bounceImageForCurrentRating()" in rating_view,
             "bounce handling must run independently of delegate callbacks",
             failures)
-    require(rating_view.count("if !self.editable") >= 2,
-            "touch handling must ignore touchesEnded when the view is not editable",
+    require(rating_view.count("if !self.editable") >= 4,
+            "touch handling must ignore began, moved, and ended touches when the view is not editable",
             failures)
     require("if touches.isEmpty" in rating_view,
             "touch handlers must ignore empty touch sets before delegate and bounce work",
@@ -214,6 +216,7 @@ def main():
     empty_touch_plan = EMPTY_TOUCH_PLAN.read_text(encoding="utf-8") if EMPTY_TOUCH_PLAN.exists() else ""
     min_image_size_plan = MIN_IMAGE_SIZE_PLAN.read_text(encoding="utf-8") if MIN_IMAGE_SIZE_PLAN.exists() else ""
     empty_touch_phase_plan = EMPTY_TOUCH_PHASE_PLAN.read_text(encoding="utf-8") if EMPTY_TOUCH_PHASE_PLAN.exists() else ""
+    noneditable_touch_phase_plan = NONEDITABLE_TOUCH_PHASE_PLAN.read_text(encoding="utf-8") if NONEDITABLE_TOUCH_PHASE_PLAN.exists() else ""
     require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
             "Makefile must expose lint, test, and build aliases for the local baseline",
             failures)
@@ -223,8 +226,14 @@ def main():
     require("empty began/moved touch" in readme,
             "README must document empty began/moved touch guards",
             failures)
+    require("non-editable began/moved touch" in readme,
+            "README must document non-editable began/moved touch guards",
+            failures)
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and "make build" in vision and "rating" in vision.lower() and "bounce" in vision.lower() and "non-editable" in vision.lower() and "empty touch" in vision.lower() and "empty began/moved touch" in vision.lower() and "minImageSize" in vision,
             "VISION must describe baseline validation for rating behavior",
+            failures)
+    require("non-editable began/moved touch" in vision,
+            "VISION must describe non-editable began/moved touch guards",
             failures)
     require("malformed configuration" in security and "make check" in security and "non-editable" in security and "empty touch" in security.lower() and "minImageSize" in security,
             "SECURITY must document configuration hardening and verification",
@@ -234,6 +243,9 @@ def main():
             failures)
     require("empty began/moved touch" in changes,
             "CHANGES must record empty began/moved touch guards",
+            failures)
+    require("non-editable began/moved touch" in changes,
+            "CHANGES must record non-editable began/moved touch guards",
             failures)
     require("status: completed" in baseline_plan and "status: completed" in rating_bounds_plan and "status: completed" in bounce_plan,
             "plans must be marked completed",
@@ -252,6 +264,9 @@ def main():
             failures)
     require("status: completed" in empty_touch_phase_plan,
             "empty touch phase plan must be marked completed",
+            failures)
+    require("status: completed" in noneditable_touch_phase_plan,
+            "non-editable touch phase plan must be marked completed",
             failures)
 
     if shutil.which("xcodebuild"):

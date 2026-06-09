@@ -22,7 +22,8 @@ Priority:
 - Avoid growing the library beyond focused rating behavior
 - Keep `scripts/check-baseline.py` passing for rating-view edge cases,
   rating bounds, `minImageSize` bounds, bounce behavior, podspec metadata,
-  project files, and build-script syntax
+  project files, non-editable began/moved touch handling, and build-script
+  syntax
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
 
@@ -56,7 +57,8 @@ guards for empty, single-item, zero-size, negative `minImageSize`, invalid
 Bounce animation should remain independent of delegate callbacks, and
 non-editable views or empty touch endings should ignore touch-ending delegate
 and bounce work. Empty began/moved touch events should ignore live-update
-delegate work.
+delegate work. Non-editable began/moved touch events should also ignore
+live-update delegate work.
 
 ## What We Will Not Merge (For Now)
 

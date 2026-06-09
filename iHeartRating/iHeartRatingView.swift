@@ -365,6 +365,9 @@ public class HeartRatingView: UIView {
     }
     
     override public func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if !self.editable {
+            return
+        }
         if touches.isEmpty {
             return
         }
@@ -376,6 +379,9 @@ public class HeartRatingView: UIView {
     }
     
     override public func touchesMoved(touches: Set<UITouch>, withEvent event: UIEvent?) {
+        if !self.editable {
+            return
+        }
         if touches.isEmpty {
             return
         }

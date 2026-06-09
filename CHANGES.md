@@ -11,6 +11,8 @@
 - Guarded empty began/moved touch events so they do not send live-update
   delegate callbacks.
 - Clamped negative `minImageSize` values to zero before requesting layout.
+- Guarded non-editable began/moved touch events so disabled controls do not
+  send live-update delegate callbacks.
 
 ## 2026-06-08
 
