@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE_PLAN = ROOT / "docs/plans/2026-06-08-rating-baseline.md"
+MAKE_GATES_PLAN = ROOT / "docs/plans/2026-06-09-make-gate-aliases.md"
 RATING_BOUNDS_PLAN = ROOT / "docs/plans/2026-06-08-rating-bounds.md"
 BOUNCE_PLAN = ROOT / "docs/plans/2026-06-08-bounce-without-delegate.md"
 NONEDITABLE_PLAN = ROOT / "docs/plans/2026-06-09-noneditable-touch-end.md"
@@ -85,6 +86,7 @@ def main():
         "assets/storyboard.png",
         "docs/readme-overview.svg",
         "docs/plans/2026-06-08-rating-baseline.md",
+        "docs/plans/2026-06-09-make-gate-aliases.md",
         "docs/plans/2026-06-08-rating-bounds.md",
         "docs/plans/2026-06-08-bounce-without-delegate.md",
         "docs/plans/2026-06-09-noneditable-touch-end.md",
@@ -203,26 +205,31 @@ def main():
     vision = read("VISION.md")
     security = read("SECURITY.md")
     changes = read("CHANGES.md")
+    makefile = read("Makefile")
     baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
+    make_gates_plan = MAKE_GATES_PLAN.read_text(encoding="utf-8") if MAKE_GATES_PLAN.exists() else ""
     rating_bounds_plan = RATING_BOUNDS_PLAN.read_text(encoding="utf-8") if RATING_BOUNDS_PLAN.exists() else ""
     bounce_plan = BOUNCE_PLAN.read_text(encoding="utf-8") if BOUNCE_PLAN.exists() else ""
     noneditable_plan = NONEDITABLE_PLAN.read_text(encoding="utf-8") if NONEDITABLE_PLAN.exists() else ""
     empty_touch_plan = EMPTY_TOUCH_PLAN.read_text(encoding="utf-8") if EMPTY_TOUCH_PLAN.exists() else ""
     min_image_size_plan = MIN_IMAGE_SIZE_PLAN.read_text(encoding="utf-8") if MIN_IMAGE_SIZE_PLAN.exists() else ""
     empty_touch_phase_plan = EMPTY_TOUCH_PHASE_PLAN.read_text(encoding="utf-8") if EMPTY_TOUCH_PHASE_PLAN.exists() else ""
-    require("make check" in readme and "build.sh" in readme and "podspec" in readme and "delegate-independent bounce" in readme and "non-editable" in readme and "empty touch" in readme.lower() and "minImageSize" in readme,
+    require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
+            "Makefile must expose lint, test, and build aliases for the local baseline",
+            failures)
+    require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "build.sh" in readme and "podspec" in readme and "delegate-independent bounce" in readme and "non-editable" in readme and "empty touch" in readme.lower() and "minImageSize" in readme,
             "README must document static verification, build script, and podspec expectations",
             failures)
     require("empty began/moved touch" in readme,
             "README must document empty began/moved touch guards",
             failures)
-    require("scripts/check-baseline.py" in vision and "rating" in vision.lower() and "bounce" in vision.lower() and "non-editable" in vision.lower() and "empty touch" in vision.lower() and "empty began/moved touch" in vision.lower() and "minImageSize" in vision,
+    require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and "make build" in vision and "rating" in vision.lower() and "bounce" in vision.lower() and "non-editable" in vision.lower() and "empty touch" in vision.lower() and "empty began/moved touch" in vision.lower() and "minImageSize" in vision,
             "VISION must describe baseline validation for rating behavior",
             failures)
     require("malformed configuration" in security and "make check" in security and "non-editable" in security and "empty touch" in security.lower() and "minImageSize" in security,
             "SECURITY must document configuration hardening and verification",
             failures)
-    require("zero-size" in changes and "maxRating" in changes and "podspec" in changes and "rating bounds" in changes and "bounce" in changes and "not editable" in changes and "empty touch" in changes.lower() and "minImageSize" in changes,
+    require("zero-size" in changes and "maxRating" in changes and "podspec" in changes and "rating bounds" in changes and "bounce" in changes and "not editable" in changes and "empty touch" in changes.lower() and "minImageSize" in changes and "make lint" in changes and "make test" in changes and "make build" in changes,
             "CHANGES must record rating edge-case, rating bounds, and podspec updates",
             failures)
     require("empty began/moved touch" in changes,
@@ -230,6 +237,9 @@ def main():
             failures)
     require("status: completed" in baseline_plan and "status: completed" in rating_bounds_plan and "status: completed" in bounce_plan,
             "plans must be marked completed",
+            failures)
+    require("status: completed" in make_gates_plan,
+            "make gate aliases plan must be marked completed",
             failures)
     require("status: completed" in noneditable_plan,
             "non-editable touch-end plan must be marked completed",

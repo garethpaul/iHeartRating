@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Added local `make lint`, `make test`, and `make build` gate aliases for the
+  static rating-view baseline.
 - Guarded `touchesEnded` when the rating view is not editable so disabled
   controls do not send delegate updates or run bounce animations.
 - Guarded empty touch-ending events so they do not send delegate updates or run

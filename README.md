@@ -44,6 +44,9 @@ Additional scan context:
 ```bash
 git clone https://github.com/garethpaul/iHeartRating.git
 cd iHeartRating
+make lint
+make test
+make build
 make check
 ```
 
@@ -60,8 +63,15 @@ The setup commands above validate the static baseline. Full simulator builds sti
 Run the local static baseline:
 
 ```bash
+make lint
+make test
+make build
 make check
 ```
+
+The `lint`, `test`, and `build` targets intentionally alias the static baseline
+on hosts without the legacy Xcode toolchain, so the standard local gate commands
+stay available while preserving the single source of truth.
 
 The baseline parses plist/storyboard/SVG files, validates both podspecs, checks `build.sh` shell syntax, verifies rating-view guards for empty, single-item, zero-size, negative `minImageSize`, invalid `maxRating`, rating bounds, non-editable touch endings, empty touch endings, empty began/moved touch events, out-of-range bounce configurations, and delegate-independent bounce behavior, and reports when Xcode is unavailable.
 
@@ -91,7 +101,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-empty-touch-phase-guard.md` for the empty
   began/moved touch guardrail.
 - See `docs/plans/2026-06-09-min-image-size-guard.md` for the `minImageSize` lower-bound guardrail.
-- Run `make check` before pushing changes to Swift sources, podspecs, plist/storyboard files, or build scripts.
+- See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
+- Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, podspecs, plist/storyboard files, or build scripts.
 
 ## Contributing
 
