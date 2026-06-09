@@ -21,8 +21,8 @@ Priority:
 - Maintain podspec and sample app alignment
 - Avoid growing the library beyond focused rating behavior
 - Keep `scripts/check-baseline.py` passing for rating-view edge cases,
-  rating bounds, bounce behavior, podspec metadata, project files, and
-  build-script syntax
+  rating bounds, `minImageSize` bounds, bounce behavior, podspec metadata,
+  project files, and build-script syntax
 
 Next priorities:
 
@@ -49,10 +49,10 @@ configuration or unexpected image assets.
 Current baseline: `make check` runs `scripts/check-baseline.py` without Xcode.
 It verifies static project metadata, CocoaPods specs, plist/storyboard files,
 build script syntax, and rating-view guards for empty, single-item, zero-size,
-invalid `maxRating`, inconsistent rating bounds, and out-of-range bounce
-configurations. Bounce animation should remain independent of delegate
-callbacks, and non-editable views or empty touch endings should ignore
-touch-ending delegate and bounce work.
+negative `minImageSize`, invalid `maxRating`, inconsistent rating bounds, and
+out-of-range bounce configurations. Bounce animation should remain independent
+of delegate callbacks, and non-editable views or empty touch endings should
+ignore touch-ending delegate and bounce work.
 
 ## What We Will Not Merge (For Now)
 

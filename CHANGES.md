@@ -6,6 +6,7 @@
   controls do not send delegate updates or run bounce animations.
 - Guarded empty touch-ending events so they do not send delegate updates or run
   bounce animations.
+- Clamped negative `minImageSize` values to zero before requesting layout.
 
 ## 2026-06-08
 

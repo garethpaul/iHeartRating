@@ -67,6 +67,13 @@ class iHeartRatingTests: XCTestCase {
         XCTAssert(imageSize.height == 0)
     }
 
+    func testMinImageSizeDoesNotStayNegative() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        hrv.minImageSize = CGSize(width: -10, height: -5)
+        XCTAssert(hrv.minImageSize.width == 0)
+        XCTAssert(hrv.minImageSize.height == 0)
+    }
+
     func testTouchesEndedDoesNotNotifyWhenNotEditable() {
         let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
         let delegate = RecordingHeartRatingDelegate()

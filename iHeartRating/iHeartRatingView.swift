@@ -114,7 +114,17 @@ public class HeartRatingView: UIView {
     /**
      Minimum image size.
      */
-    @IBInspectable public var minImageSize: CGSize = CGSize(width: 5.0, height: 5.0)
+    @IBInspectable public var minImageSize: CGSize = CGSize(width: 5.0, height: 5.0) {
+        didSet {
+            if minImageSize.width < 0 || minImageSize.height < 0 {
+                minImageSize = CGSize(
+                    width: max(CGFloat(0.0), minImageSize.width),
+                    height: max(CGFloat(0.0), minImageSize.height)
+                )
+            }
+            self.setNeedsLayout()
+        }
+    }
     
     /**
      Set the current rating.

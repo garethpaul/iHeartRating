@@ -63,7 +63,7 @@ Run the local static baseline:
 make check
 ```
 
-The baseline parses plist/storyboard/SVG files, validates both podspecs, checks `build.sh` shell syntax, verifies rating-view guards for empty, single-item, zero-size, invalid `maxRating`, rating bounds, non-editable touch endings, empty touch endings, out-of-range bounce configurations, and delegate-independent bounce behavior, and reports when Xcode is unavailable.
+The baseline parses plist/storyboard/SVG files, validates both podspecs, checks `build.sh` shell syntax, verifies rating-view guards for empty, single-item, zero-size, negative `minImageSize`, invalid `maxRating`, rating bounds, non-editable touch endings, empty touch endings, out-of-range bounce configurations, and delegate-independent bounce behavior, and reports when Xcode is unavailable.
 
 For full legacy verification on macOS, use Xcode's test action, `xcodebuild test`, or `./build.sh` with the appropriate scheme and destination.
 
@@ -78,7 +78,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Review changes touching network requests, sockets, or service endpoints; examples from the scan include example/SampleApp/SampleApp/Info.plist, example/SampleApp/SampleAppTests/Info.plist, example/SampleApp/SampleAppUITests/Info.plist, iHeartRating/Info.plist, and 1 more.
 - Review changes touching mobile permissions or privacy-sensitive device data; examples from the scan include iHeartRating/iHeartRatingView.swift.
 - Review changes touching file, media, JSON, XML, CSV, OCR, or data parsing; examples from the scan include example/SampleApp/SampleApp/Info.plist, example/SampleApp/SampleAppTests/Info.plist, example/SampleApp/SampleAppUITests/Info.plist, iHeartRating/Info.plist, and 2 more.
-- UI configuration changes should not crash on empty image arrays, single-rating views, zero-sized images, invalid `maxRating`, inconsistent rating bounds, or out-of-range ratings.
+- UI configuration changes should not crash on empty image arrays, single-rating views, zero-sized images, negative `minImageSize`, invalid `maxRating`, inconsistent rating bounds, or out-of-range ratings.
 
 ## Maintenance Notes
 
@@ -88,6 +88,7 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-08-bounce-without-delegate.md` for the bounce-without-delegate guardrail.
 - See `docs/plans/2026-06-09-noneditable-touch-end.md` for the non-editable touch-ending guardrail.
 - See `docs/plans/2026-06-09-empty-touch-end.md` for the empty touch-ending guardrail.
+- See `docs/plans/2026-06-09-min-image-size-guard.md` for the `minImageSize` lower-bound guardrail.
 - Run `make check` before pushing changes to Swift sources, podspecs, plist/storyboard files, or build scripts.
 
 ## Contributing
