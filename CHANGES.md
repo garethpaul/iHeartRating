@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-10
+
+- Added pinned, read-only macOS CI for the canonical `make check` baseline.
+- Made Xcode-enabled checks parse both the library and SampleApp projects while
+  keeping full Swift 2 compilation tied to a compatible legacy toolchain.
+
 ## 2026-06-09
 
 - Added image layout invalidation when rating images change so refreshed masks

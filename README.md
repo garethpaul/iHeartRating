@@ -79,7 +79,13 @@ delegate callbacks.
 It also keeps image layout invalidation in the rating image setters so runtime
 image changes recalculate frames before masks refresh.
 
-For full legacy verification on macOS, use Xcode's test action, `xcodebuild test`, or `./build.sh` with the appropriate scheme and destination.
+The pinned GitHub Actions check runs `make check` on `macos-15`. When Xcode is
+available, the baseline parses both `iHeartRating.xcodeproj` and the SampleApp
+project with `xcodebuild -list`. This verifies project-file integrity but does
+not claim that Swift 2 sources compile on a current Xcode toolchain.
+
+For full legacy verification, use Xcode 7.3 with its matching simulator runtime
+and run Xcode's test action, `xcodebuild test`, or `./build.sh`.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
 

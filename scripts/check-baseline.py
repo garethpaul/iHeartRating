@@ -19,6 +19,7 @@ MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-09-min-image-size-guard.md"
 EMPTY_TOUCH_PHASE_PLAN = ROOT / "docs/plans/2026-06-09-empty-touch-phase-guard.md"
 NONEDITABLE_TOUCH_PHASE_PLAN = ROOT / "docs/plans/2026-06-09-noneditable-touch-phase-guard.md"
 IMAGE_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-09-rating-image-layout-invalidation.md"
+HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
 
 
 def require(condition, message, failures):
@@ -62,6 +63,7 @@ def main():
     failures = []
     required_files = [
         ".gitignore",
+        ".github/workflows/check.yml",
         ".travis.yml",
         "CHANGES.md",
         "LICENSE",
@@ -97,6 +99,7 @@ def main():
         "docs/plans/2026-06-09-empty-touch-phase-guard.md",
         "docs/plans/2026-06-09-noneditable-touch-phase-guard.md",
         "docs/plans/2026-06-09-rating-image-layout-invalidation.md",
+        "docs/plans/2026-06-10-hosted-project-validation.md",
     ]
 
     for relative_path in required_files:
@@ -226,6 +229,8 @@ def main():
     empty_touch_phase_plan = EMPTY_TOUCH_PHASE_PLAN.read_text(encoding="utf-8") if EMPTY_TOUCH_PHASE_PLAN.exists() else ""
     noneditable_touch_phase_plan = NONEDITABLE_TOUCH_PHASE_PLAN.read_text(encoding="utf-8") if NONEDITABLE_TOUCH_PHASE_PLAN.exists() else ""
     image_layout_plan = IMAGE_LAYOUT_PLAN.read_text(encoding="utf-8") if IMAGE_LAYOUT_PLAN.exists() else ""
+    hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
+    workflow = read(".github/workflows/check.yml")
     require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
             "Makefile must expose lint, test, and build aliases for the local baseline",
             failures)
@@ -280,9 +285,26 @@ def main():
     require("status: completed" in image_layout_plan,
             "rating image layout invalidation plan must be marked completed",
             failures)
+    require("status: completed" in hosted_validation_plan and "make check" in hosted_validation_plan,
+            "hosted project validation plan must be completed and document make check",
+            failures)
+    require("permissions:\n  contents: read" in workflow,
+            "Check workflow must use read-only repository permissions",
+            failures)
+    require("cancel-in-progress: true" in workflow and "runs-on: macos-15" in workflow and
+            "timeout-minutes: 10" in workflow,
+            "Check workflow must bound duplicate and long-running macOS jobs",
+            failures)
+    require("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" in workflow and
+            "run: make check" in workflow,
+            "Check workflow must pin checkout and run the canonical baseline",
+            failures)
 
     if shutil.which("xcodebuild"):
-        print("xcodebuild is available; run ./build.sh on macOS before release.")
+        run(["xcodebuild", "-list", "-project", "iHeartRating.xcodeproj"],
+            failures, "xcodebuild must parse iHeartRating.xcodeproj")
+        run(["xcodebuild", "-list", "-project", "example/SampleApp/SampleApp.xcodeproj"],
+            failures, "xcodebuild must parse the SampleApp project")
     else:
         print("xcodebuild unavailable; static iOS baseline only.")
 

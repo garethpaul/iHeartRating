@@ -30,6 +30,9 @@ Helpful reports include:
 - Review found file, document, data, or media parsing flows; changes in those areas should receive security-focused review before merge.
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
 - `make check` runs a static baseline for malformed configuration hardening, CocoaPods metadata, plist/storyboard parsing, build-script syntax, rating bounds, and rating-view edge cases when Xcode is unavailable.
+- The pinned macOS workflow uses read-only repository permissions and parses
+  both Xcode projects without credentials, signing material, or package
+  publication access.
 - Rating controls should not crash on empty image arrays, single-rating views, zero-sized images, negative `minImageSize`, invalid `maxRating`, inconsistent rating bounds, out-of-range ratings, non-editable touch endings, empty touch endings, or unexpected image assets.
 - Runtime image changes should keep image layout invalidation before mask refreshes.
 
