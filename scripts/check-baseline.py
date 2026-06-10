@@ -20,6 +20,7 @@ EMPTY_TOUCH_PHASE_PLAN = ROOT / "docs/plans/2026-06-09-empty-touch-phase-guard.m
 NONEDITABLE_TOUCH_PHASE_PLAN = ROOT / "docs/plans/2026-06-09-noneditable-touch-phase-guard.md"
 IMAGE_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-09-rating-image-layout-invalidation.md"
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
+NAN_RATING_PLAN = ROOT / "docs/plans/2026-06-10-nan-rating-boundary.md"
 
 
 def require(condition, message, failures):
@@ -100,6 +101,7 @@ def main():
         "docs/plans/2026-06-09-noneditable-touch-phase-guard.md",
         "docs/plans/2026-06-09-rating-image-layout-invalidation.md",
         "docs/plans/2026-06-10-hosted-project-validation.md",
+        "docs/plans/2026-06-10-nan-rating-boundary.md",
     ]
 
     for relative_path in required_files:
@@ -142,6 +144,9 @@ def main():
     require("private func boundedRating" in rating_view and
             "return min(max(rating, Float(self.minRating)), Float(self.maxRating))" in rating_view,
             "rating assignments must be bounded by minRating and maxRating",
+            failures)
+    require("if rating != rating" in rating_view and "return Float(self.minRating)" in rating_view,
+            "NaN ratings must fall back to minRating before rendering or bounce indexing",
             failures)
     require("if minRating < 0" in rating_view and "if minRating > maxRating" in rating_view,
             "minRating must stay non-negative and not exceed maxRating",
@@ -191,6 +196,7 @@ def main():
             failures)
     require("testMaxRatingDoesNotStayBelowOne" in tests and "testZeroSizeImageReturnsZeroSize" in tests and
             "testRatingDoesNotExceedMaxRating" in tests and "testMinRatingDoesNotExceedMaxRating" in tests and
+            "testNaNRatingFallsBackToMinRating" in tests and "Float(0.0) / Float(0.0)" in tests and
             "testMinImageSizeDoesNotStayNegative" in tests and
             "testTouchesEndedDoesNotNotifyWhenNotEditable" in tests and
             "testTouchesEndedDoesNotNotifyWithoutTouches" in tests and
@@ -230,6 +236,7 @@ def main():
     noneditable_touch_phase_plan = NONEDITABLE_TOUCH_PHASE_PLAN.read_text(encoding="utf-8") if NONEDITABLE_TOUCH_PHASE_PLAN.exists() else ""
     image_layout_plan = IMAGE_LAYOUT_PLAN.read_text(encoding="utf-8") if IMAGE_LAYOUT_PLAN.exists() else ""
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
+    nan_rating_plan = NAN_RATING_PLAN.read_text(encoding="utf-8") if NAN_RATING_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
     require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
             "Makefile must expose lint, test, and build aliases for the local baseline",
@@ -287,6 +294,9 @@ def main():
             failures)
     require("status: completed" in hosted_validation_plan and "make check" in hosted_validation_plan,
             "hosted project validation plan must be completed and document make check",
+            failures)
+    require("status: completed" in nan_rating_plan and "make check" in nan_rating_plan,
+            "NaN rating boundary plan must be completed and document verification",
             failures)
     require("permissions:\n  contents: read" in workflow,
             "Check workflow must use read-only repository permissions",

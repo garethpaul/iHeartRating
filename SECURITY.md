@@ -34,6 +34,8 @@ Helpful reports include:
   both Xcode projects without credentials, signing material, or package
   publication access.
 - Rating controls should not crash on empty image arrays, single-rating views, zero-sized images, negative `minImageSize`, invalid `maxRating`, inconsistent rating bounds, out-of-range ratings, non-editable touch endings, empty touch endings, or unexpected image assets.
+- NaN ratings must be normalized before mask calculations or integer conversion
+  for bounce animation indexing.
 - Runtime image changes should keep image layout invalidation before mask refreshes.
 
 ## Mobile Privacy Notes

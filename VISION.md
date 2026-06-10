@@ -25,6 +25,7 @@ Priority:
   project files, non-editable began/moved touch handling, and build-script
   syntax
 - Keep image layout invalidation tied to runtime rating image changes
+- Normalize NaN rating assignments before rendering and animation indexing
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
 - Keep pinned macOS CI parsing both Xcode projects through the canonical

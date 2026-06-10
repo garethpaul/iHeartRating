@@ -182,6 +182,9 @@ public class HeartRatingView: UIView {
     // MARK: Refresh hides or shows full images
 
     private func boundedRating(rating: Float) -> Float {
+        if rating != rating {
+            return Float(self.minRating)
+        }
         return min(max(rating, Float(self.minRating)), Float(self.maxRating))
     }
     

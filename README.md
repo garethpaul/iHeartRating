@@ -78,6 +78,8 @@ It also keeps non-editable began/moved touch events from sending live-update
 delegate callbacks.
 It also keeps image layout invalidation in the rating image setters so runtime
 image changes recalculate frames before masks refresh.
+NaN programmatic ratings fall back to `minRating` before mask rendering or
+bounce animation indexing.
 
 The pinned GitHub Actions check runs `make check` on `macos-15`. When Xcode is
 available, the baseline parses both `iHeartRating.xcodeproj` and the SampleApp
@@ -117,6 +119,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-min-image-size-guard.md` for the `minImageSize` lower-bound guardrail.
 - See `docs/plans/2026-06-09-rating-image-layout-invalidation.md` for the
   image layout invalidation guardrail.
+- See `docs/plans/2026-06-10-nan-rating-boundary.md` for non-finite rating
+  normalization.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, podspecs, plist/storyboard files, or build scripts.
 

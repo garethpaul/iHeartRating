@@ -57,6 +57,13 @@ class iHeartRatingTests: XCTestCase {
         XCTAssert(hrv.rating == 3)
     }
 
+    func testNaNRatingFallsBackToMinRating() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        hrv.minRating = 2
+        hrv.rating = Float(0.0) / Float(0.0)
+        XCTAssert(hrv.rating == 2)
+    }
+
     func testMinRatingDoesNotExceedMaxRating() {
         let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
         hrv.maxRating = 2
