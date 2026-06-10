@@ -76,6 +76,8 @@ stay available while preserving the single source of truth.
 The baseline parses plist/storyboard/SVG files, validates both podspecs, checks `build.sh` shell syntax, verifies rating-view guards for empty, single-item, zero-size, negative `minImageSize`, invalid `maxRating`, rating bounds, non-editable touch endings, empty touch endings, empty began/moved touch events, out-of-range bounce configurations, and delegate-independent bounce behavior, and reports when Xcode is unavailable.
 It also keeps non-editable began/moved touch events from sending live-update
 delegate callbacks.
+It also keeps image layout invalidation in the rating image setters so runtime
+image changes recalculate frames before masks refresh.
 
 For full legacy verification on macOS, use Xcode's test action, `xcodebuild test`, or `./build.sh` with the appropriate scheme and destination.
 
@@ -91,6 +93,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - Review changes touching mobile permissions or privacy-sensitive device data; examples from the scan include iHeartRating/iHeartRatingView.swift.
 - Review changes touching file, media, JSON, XML, CSV, OCR, or data parsing; examples from the scan include example/SampleApp/SampleApp/Info.plist, example/SampleApp/SampleAppTests/Info.plist, example/SampleApp/SampleAppUITests/Info.plist, iHeartRating/Info.plist, and 2 more.
 - UI configuration changes should not crash on empty image arrays, single-rating views, zero-sized images, negative `minImageSize`, invalid `maxRating`, inconsistent rating bounds, or out-of-range ratings.
+- Runtime image changes should preserve image layout invalidation before mask
+  refresh work runs.
 
 ## Maintenance Notes
 
@@ -105,6 +109,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - See `docs/plans/2026-06-09-noneditable-touch-phase-guard.md` for the
   non-editable began/moved touch guardrail.
 - See `docs/plans/2026-06-09-min-image-size-guard.md` for the `minImageSize` lower-bound guardrail.
+- See `docs/plans/2026-06-09-rating-image-layout-invalidation.md` for the
+  image layout invalidation guardrail.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, podspecs, plist/storyboard files, or build scripts.
 

@@ -46,6 +46,7 @@ public class HeartRatingView: UIView {
             for imageView in self.emptyImageViews {
                 imageView.image = emptyImage
             }
+            self.setNeedsLayout()
             self.refresh()
         }
     }
@@ -60,6 +61,7 @@ public class HeartRatingView: UIView {
             for imageView in self.fullImageViews {
                 imageView.image = fullImage
             }
+            self.setNeedsLayout()
             self.refresh()
         }
     }

@@ -2,6 +2,8 @@
 
 ## 2026-06-09
 
+- Added image layout invalidation when rating images change so refreshed masks
+  use current image frames.
 - Added local `make lint`, `make test`, and `make build` gate aliases for the
   static rating-view baseline.
 - Guarded `touchesEnded` when the rating view is not editable so disabled

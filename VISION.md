@@ -24,6 +24,7 @@ Priority:
   rating bounds, `minImageSize` bounds, bounce behavior, podspec metadata,
   project files, non-editable began/moved touch handling, and build-script
   syntax
+- Keep image layout invalidation tied to runtime rating image changes
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
 
@@ -59,6 +60,8 @@ non-editable views or empty touch endings should ignore touch-ending delegate
 and bounce work. Empty began/moved touch events should ignore live-update
 delegate work. Non-editable began/moved touch events should also ignore
 live-update delegate work.
+Image layout invalidation should run when rating images change so masks refresh
+against current frames.
 
 ## What We Will Not Merge (For Now)
 
