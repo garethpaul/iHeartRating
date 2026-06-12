@@ -25,6 +25,7 @@ Priority:
   project files, non-editable began/moved touch handling, and build-script
   syntax
 - Keep image layout invalidation tied to runtime rating image changes
+- Keep child image geometry in the rating view's local bounds coordinate space
 - Normalize NaN rating assignments before rendering and animation indexing
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
@@ -65,6 +66,8 @@ delegate work. Non-editable began/moved touch events should also ignore
 live-update delegate work.
 Image layout invalidation should run when rating images change so masks refresh
 against current frames.
+Scaled or rotated rating views should continue laying out child images from
+local bounds rather than transformed frame dimensions.
 On macOS, the baseline should also parse both Xcode projects. Full Swift 2
 compilation and simulator testing remain tied to Xcode 7.3 and a compatible
 runtime.

@@ -78,6 +78,8 @@ It also keeps non-editable began/moved touch events from sending live-update
 delegate callbacks.
 It also keeps image layout invalidation in the rating image setters so runtime
 image changes recalculate frames before masks refresh.
+Rating image geometry is calculated from the view's local bounds so transforms
+do not inflate or misalign child images.
 NaN programmatic ratings fall back to `minRating` before mask rendering or
 bounce animation indexing.
 
@@ -104,6 +106,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
 - UI configuration changes should not crash on empty image arrays, single-rating views, zero-sized images, negative `minImageSize`, invalid `maxRating`, inconsistent rating bounds, or out-of-range ratings.
 - Runtime image changes should preserve image layout invalidation before mask
   refresh work runs.
+- Rating image layout should use local bounds rather than transformed frame
+  dimensions.
 
 ## Maintenance Notes
 
@@ -122,6 +126,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   image layout invalidation guardrail.
 - See `docs/plans/2026-06-10-nan-rating-boundary.md` for non-finite rating
   normalization.
+- See `docs/plans/2026-06-12-bounds-based-image-layout.md` for transformed-view
+  layout correctness.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, podspecs, plist/storyboard files, or build scripts.
 

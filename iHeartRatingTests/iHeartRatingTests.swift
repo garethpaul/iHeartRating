@@ -86,6 +86,22 @@ class iHeartRatingTests: XCTestCase {
         XCTAssert(hrv.minImageSize.height == 0)
     }
 
+    func testLayoutUsesLocalBoundsWhenViewIsScaled() {
+        UIGraphicsBeginImageContextWithOptions(CGSize(width: 20, height: 20), false, 1)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        hrv.emptyImage = image
+        hrv.transform = CGAffineTransformMakeScale(2, 2)
+        hrv.layoutSubviews()
+
+        let firstImageView = hrv.subviews.first as! UIImageView
+        XCTAssert(hrv.frame.size.width == 200)
+        XCTAssert(hrv.bounds.size.width == 100)
+        XCTAssert(abs(firstImageView.frame.size.width - 20) < 0.001)
+    }
+
     func testTouchesEndedDoesNotNotifyWhenNotEditable() {
         let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
         let delegate = RecordingHeartRatingDelegate()
