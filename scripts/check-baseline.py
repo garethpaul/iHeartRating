@@ -314,8 +314,25 @@ def main():
     require("status: completed" in nan_rating_plan and "make check" in nan_rating_plan,
             "NaN rating boundary plan must be completed and document verification",
             failures)
-    require("status: completed" in bounds_layout_plan and "frame-based" in bounds_layout_plan,
-            "bounds-based image layout plan must record completed mutation verification",
+    bounds_layout_statuses = re.findall(
+        r"^status: .+$", bounds_layout_plan, flags=re.MULTILINE
+    )
+    bounds_layout_sections = bounds_layout_plan.split("## Verification Completed\n", 1)
+    bounds_layout_verification = (
+        bounds_layout_sections[1] if len(bounds_layout_sections) == 2 else ""
+    )
+    bounds_layout_required_evidence = (
+        "All four Make gates",
+        "push run `27394309114`",
+        "pull-request run `27394315070`",
+        "push run `27394330649`",
+        "CodeQL setup run `27402322718`",
+        "mutation restoring `frame`-based image sizing",
+    )
+    require(bounds_layout_statuses == ["status: completed"]
+            and all(item in bounds_layout_verification for item in bounds_layout_required_evidence)
+            and re.search(r"\b(?:pending|todo|tbd|not run)\b", bounds_layout_verification, re.IGNORECASE) is None,
+            "bounds-based image layout plan must record completed status and actual verification",
             failures)
     require(workflow.count("permissions:\n  contents: read") == 1 and
             not re.search(r"(?m)^\s{2,}permissions:\s*$", workflow) and
