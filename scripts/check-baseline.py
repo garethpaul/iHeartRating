@@ -298,16 +298,19 @@ def main():
     require("status: completed" in nan_rating_plan and "make check" in nan_rating_plan,
             "NaN rating boundary plan must be completed and document verification",
             failures)
-    require("permissions:\n  contents: read" in workflow,
-            "Check workflow must use read-only repository permissions",
+    require(workflow.count("permissions:\n  contents: read") == 1 and
+            not re.search(r"(?m)^\s{2,}permissions:\s*$", workflow) and
+            not re.search(r"(?m)^\s+[A-Za-z0-9_-]+:\s*write\s*$", workflow),
+            "Check workflow must use one top-level read-only permissions block",
             failures)
     require("cancel-in-progress: true" in workflow and "runs-on: macos-15" in workflow and
             "timeout-minutes: 10" in workflow,
             "Check workflow must bound duplicate and long-running macOS jobs",
             failures)
-    require("actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10" in workflow and
+    require(workflow.count("uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10") == 1 and
+            "persist-credentials: false" in workflow and
             "run: make check" in workflow,
-            "Check workflow must pin checkout and run the canonical baseline",
+            "Check workflow must pin one credential-free checkout and run the canonical baseline",
             failures)
 
     if shutil.which("xcodebuild"):

@@ -81,10 +81,11 @@ image changes recalculate frames before masks refresh.
 NaN programmatic ratings fall back to `minRating` before mask rendering or
 bounce animation indexing.
 
-The pinned GitHub Actions check runs `make check` on `macos-15`. When Xcode is
-available, the baseline parses both `iHeartRating.xcodeproj` and the SampleApp
-project with `xcodebuild -list`. This verifies project-file integrity but does
-not claim that Swift 2 sources compile on a current Xcode toolchain.
+The pinned, credential-free GitHub Actions check runs `make check` on
+`macos-15`. When Xcode is available, the baseline parses both
+`iHeartRating.xcodeproj` and the SampleApp project with `xcodebuild -list`.
+This verifies project-file integrity but does not claim that Swift 2 sources
+compile on a current Xcode toolchain.
 
 For full legacy verification, use Xcode 7.3 with its matching simulator runtime
 and run Xcode's test action, `xcodebuild test`, or `./build.sh`.
