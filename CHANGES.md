@@ -4,7 +4,8 @@
 
 - Normalized NaN rating assignments to `minRating` before rendering or bounce
   index conversion.
-- Added pinned, read-only macOS CI for the canonical `make check` baseline.
+- Added pinned, read-only macOS CI without persisted checkout credentials for
+  the canonical `make check` baseline.
 - Made Xcode-enabled checks parse both the library and SampleApp projects while
   keeping full Swift 2 compilation tied to a compatible legacy toolchain.
 

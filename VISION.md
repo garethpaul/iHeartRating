@@ -28,8 +28,8 @@ Priority:
 - Normalize NaN rating assignments before rendering and animation indexing
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
-- Keep pinned macOS CI parsing both Xcode projects through the canonical
-  `make check` gate
+- Keep pinned, credential-free macOS CI parsing both Xcode projects through the
+  canonical `make check` gate
 
 Next priorities:
 

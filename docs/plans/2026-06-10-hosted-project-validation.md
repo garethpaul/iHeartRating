@@ -11,7 +11,8 @@ current hosted project-file check.
 
 ## Completed Scope
 
-- Added a pinned GitHub Actions workflow with read-only repository permissions.
+- Added a pinned GitHub Actions workflow with read-only repository permissions
+  and disabled checkout credential persistence.
 - Runs the canonical `make check` gate on a bounded `macos-15` job.
 - Parses both the library and SampleApp Xcode projects when Xcode is available.
 - Kept full Swift 2 compilation and simulator testing tied to Xcode 7.3 and its
