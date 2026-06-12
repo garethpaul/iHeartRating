@@ -37,6 +37,8 @@ Helpful reports include:
 - NaN ratings must be normalized before mask calculations or integer conversion
   for bounce animation indexing.
 - Runtime image changes should keep image layout invalidation before mask refreshes.
+- Transformed rating views should calculate child geometry from local bounds,
+  avoiding oversized or misaligned interactive regions.
 
 ## Mobile Privacy Notes
 

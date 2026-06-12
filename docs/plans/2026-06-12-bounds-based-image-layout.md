@@ -1,6 +1,6 @@
 # Bounds-Based Rating Image Layout
 
-status: planned
+status: completed
 
 ## Context
 
@@ -11,7 +11,7 @@ view's local `bounds` coordinate space. Scaled or rotated rating views can
 therefore lay out hearts using transformed dimensions and produce oversized or
 misaligned content.
 
-## Scope
+## Completed Scope
 
 - Calculate image width, height, spacing, and origin from `bounds`.
 - Preserve existing minimum image size and single-image safeguards.

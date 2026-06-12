@@ -250,15 +250,21 @@ public class HeartRatingView: UIView {
                 return
             }
 
-            let desiredImageWidth = self.frame.size.width / CGFloat(imageCount)
+            let layoutBounds = self.bounds
+            let desiredImageWidth = layoutBounds.size.width / CGFloat(imageCount)
             let maxImageWidth = max(self.minImageSize.width, desiredImageWidth)
-            let maxImageHeight = max(self.minImageSize.height, self.frame.size.height)
+            let maxImageHeight = max(self.minImageSize.height, layoutBounds.size.height)
             let imageViewSize = self.sizeForImage(emptyImage, inSize: CGSizeMake(maxImageWidth, maxImageHeight))
             let imageXOffset = imageCount > 1 ?
-                (self.frame.size.width - (imageViewSize.width * CGFloat(imageCount))) / CGFloat(imageCount - 1) : 0
+                (layoutBounds.size.width - (imageViewSize.width * CGFloat(imageCount))) / CGFloat(imageCount - 1) : 0
             
             for i in 0..<imageCount {
-                let imageFrame = CGRectMake(i==0 ? 0:CGFloat(i)*(imageXOffset+imageViewSize.width), 0, imageViewSize.width, imageViewSize.height)
+                let imageFrame = CGRectMake(
+                    layoutBounds.origin.x + (i == 0 ? 0 : CGFloat(i) * (imageXOffset + imageViewSize.width)),
+                    layoutBounds.origin.y,
+                    imageViewSize.width,
+                    imageViewSize.height
+                )
                 
                 var imageView = self.emptyImageViews[i]
                 imageView.frame = imageFrame

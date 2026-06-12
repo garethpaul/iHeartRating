@@ -8,6 +8,8 @@
   the canonical `make check` baseline.
 - Made Xcode-enabled checks parse both the library and SampleApp projects while
   keeping full Swift 2 compilation tied to a compatible legacy toolchain.
+- Calculated rating image geometry from local bounds so view transforms do not
+  distort child layout.
 
 ## 2026-06-09
 
