@@ -39,6 +39,8 @@ Helpful reports include:
 - Runtime image changes should keep image layout invalidation before mask refreshes.
 - Transformed rating views should calculate child geometry from local bounds,
   avoiding oversized or misaligned interactive regions.
+- An incomplete image pair should hide full overlays and remove stale masks
+  rather than displaying a rating without its empty-image baseline.
 
 ## Mobile Privacy Notes
 

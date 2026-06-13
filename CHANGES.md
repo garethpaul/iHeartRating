@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-13
+
+- Made incomplete image pair configuration hide full rating overlays and clear
+  stale masks until both images are configured again.
+
 ## 2026-06-10
 
 - Normalized NaN rating assignments to `minRating` before rendering or bounce

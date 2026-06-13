@@ -102,6 +102,31 @@ class iHeartRatingTests: XCTestCase {
         XCTAssert(abs(firstImageView.frame.size.width - 20) < 0.001)
     }
 
+    func testIncompleteImagePairHidesAndRestoresFullImages() {
+        UIGraphicsBeginImageContextWithOptions(CGSize(width: 20, height: 20), false, 1)
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        hrv.emptyImage = image
+        hrv.fullImage = image
+        hrv.rating = 0.5
+        hrv.layoutSubviews()
+
+        let firstFullImageView = hrv.subviews[1] as! UIImageView
+        XCTAssertFalse(firstFullImageView.hidden)
+        XCTAssertNotNil(firstFullImageView.layer.mask)
+
+        hrv.emptyImage = nil
+        XCTAssertTrue(firstFullImageView.hidden)
+        XCTAssertNil(firstFullImageView.layer.mask)
+
+        hrv.emptyImage = image
+        hrv.layoutSubviews()
+        XCTAssertFalse(firstFullImageView.hidden)
+        XCTAssertNotNil(firstFullImageView.layer.mask)
+    }
+
     func testTouchesEndedDoesNotNotifyWhenNotEditable() {
         let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
         let delegate = RecordingHeartRatingDelegate()
