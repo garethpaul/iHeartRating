@@ -24,6 +24,7 @@ NAN_RATING_PLAN = ROOT / "docs/plans/2026-06-10-nan-rating-boundary.md"
 BOUNDS_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-12-bounds-based-image-layout.md"
 INCOMPLETE_IMAGE_PLAN = ROOT / "docs/plans/2026-06-13-incomplete-image-pair.md"
 NAN_MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-13-nan-min-image-size.md"
+INFINITE_MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-13-infinite-min-image-size.md"
 
 
 def require(condition, message, failures):
@@ -108,6 +109,7 @@ def main():
         "docs/plans/2026-06-12-bounds-based-image-layout.md",
         "docs/plans/2026-06-13-incomplete-image-pair.md",
         "docs/plans/2026-06-13-nan-min-image-size.md",
+        "docs/plans/2026-06-13-infinite-min-image-size.md",
     ]
 
     for relative_path in required_files:
@@ -169,14 +171,22 @@ def main():
     require("if image.size.width <= 0 || image.size.height <= 0 || size.width <= 0 || size.height <= 0" in rating_view,
             "sizeForImage must guard zero-sized images and containers",
             failures)
-    require("minImageSize.width < 0 || minImageSize.height < 0" in rating_view and
+    require("minImageSize.width < 0" in rating_view and
+            "minImageSize.height < 0" in rating_view and
             "minImageSize = CGSize" in rating_view and "setNeedsLayout()" in rating_view,
             "minImageSize must be clamped to non-negative values and trigger layout",
             failures)
     require("minImageSize.width != minImageSize.width" in rating_view and
             "minImageSize.height != minImageSize.height" in rating_view and
-            rating_view.count("? CGFloat(0.0) : max(CGFloat(0.0), minImageSize.") == 2,
+            "width: widthIsInvalid ? CGFloat(0.0) : minImageSize.width" in rating_view and
+            "height: heightIsInvalid ? CGFloat(0.0) : minImageSize.height" in rating_view,
             "minImageSize must normalize NaN width and height independently",
+            failures)
+    require("isinf(Double(minImageSize.width))" in rating_view and
+            "isinf(Double(minImageSize.height))" in rating_view and
+            "func testMinImageSizeDoesNotStayPositiveInfinity()" in tests and
+            "func testMinImageSizeDoesNotStayNegativeInfinity()" in tests,
+            "minImageSize must normalize infinite width and height independently",
             failures)
     require(re.search(r"@IBInspectable public var emptyImage: UIImage\? \{.*?didSet \{.*?self\.setNeedsLayout\(\).*?self\.refresh\(\)", rating_view, re.DOTALL),
             "emptyImage changes must invalidate layout before refreshing masks",
@@ -285,6 +295,7 @@ def main():
     bounds_layout_plan = BOUNDS_LAYOUT_PLAN.read_text(encoding="utf-8") if BOUNDS_LAYOUT_PLAN.exists() else ""
     incomplete_image_plan = INCOMPLETE_IMAGE_PLAN.read_text(encoding="utf-8") if INCOMPLETE_IMAGE_PLAN.exists() else ""
     nan_min_image_size_plan = NAN_MIN_IMAGE_SIZE_PLAN.read_text(encoding="utf-8") if NAN_MIN_IMAGE_SIZE_PLAN.exists() else ""
+    infinite_min_image_size_plan = INFINITE_MIN_IMAGE_SIZE_PLAN.read_text(encoding="utf-8") if INFINITE_MIN_IMAGE_SIZE_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
     require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
             "Makefile must expose lint, test, and build aliases for the local baseline",
@@ -306,6 +317,12 @@ def main():
             "Normalize NaN `minImageSize` dimensions" in vision and
             "Normalized NaN `minImageSize` width and height independently" in changes,
             "Docs must record NaN minimum-image-size normalization",
+            failures)
+    require("Infinite `minImageSize` dimensions normalize independently" in readme and
+            "Infinite `minImageSize` dimensions must normalize to zero" in security and
+            "Normalize infinite `minImageSize` dimensions" in vision and
+            "Normalized infinite `minImageSize` width and height independently" in changes,
+            "Docs must record infinite minimum-image-size normalization",
             failures)
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and "make build" in vision and "rating" in vision.lower() and "bounce" in vision.lower() and "non-editable" in vision.lower() and "empty touch" in vision.lower() and "empty began/moved touch" in vision.lower() and "minImageSize" in vision and "image layout invalidation" in vision and "local bounds" in vision.lower(),
             "VISION must describe baseline validation for rating behavior",
@@ -396,6 +413,33 @@ def main():
                           nan_min_image_size_verification,
                           re.IGNORECASE) is None,
             "NaN minImageSize plan must record completed status and actual local verification",
+            failures)
+    infinite_min_image_size_statuses = re.findall(
+        r"^status: .+$", infinite_min_image_size_plan, flags=re.MULTILINE
+    )
+    infinite_min_image_size_sections = infinite_min_image_size_plan.split(
+        "## Verification Completed\n", 1
+    )
+    infinite_min_image_size_verification = (
+        infinite_min_image_size_sections[1]
+        if len(infinite_min_image_size_sections) == 2 else ""
+    )
+    infinite_min_image_size_required_evidence = (
+        "All four Make gates",
+        "`xcodebuild` was",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "sh -n build.sh",
+        "ruby -c iHeartRating.podspec",
+        "git diff --check",
+        "Five isolated hostile mutations",
+    )
+    require(infinite_min_image_size_statuses == ["status: completed"]
+            and all(item in infinite_min_image_size_verification
+                    for item in infinite_min_image_size_required_evidence)
+            and re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                          infinite_min_image_size_verification,
+                          re.IGNORECASE) is None,
+            "infinite minImageSize plan must record completed status and actual local verification",
             failures)
     bounds_layout_statuses = re.findall(
         r"^status: .+$", bounds_layout_plan, flags=re.MULTILINE
