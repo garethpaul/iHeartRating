@@ -36,6 +36,8 @@ Helpful reports include:
 - Rating controls should not crash on empty image arrays, single-rating views, zero-sized images, negative `minImageSize`, invalid `maxRating`, inconsistent rating bounds, out-of-range ratings, non-editable touch endings, empty touch endings, or unexpected image assets.
 - NaN ratings must be normalized before mask calculations or integer conversion
   for bounce animation indexing.
+- NaN `minImageSize` dimensions must normalize to zero before layout geometry is
+  calculated.
 - Runtime image changes should keep image layout invalidation before mask refreshes.
 - Transformed rating views should calculate child geometry from local bounds,
   avoiding oversized or misaligned interactive regions.

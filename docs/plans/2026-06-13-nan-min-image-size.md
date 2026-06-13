@@ -1,6 +1,6 @@
 # Normalize NaN Minimum Image Sizes
 
-status: planned
+status: completed
 
 ## Context
 
@@ -40,8 +40,25 @@ through layout `max(...)`, aspect sizing, and child image frames.
 
 ## Work Completed
 
-Pending implementation.
+- Normalized NaN width and height values independently to zero in the
+  `minImageSize` setter.
+- Preserved each valid companion dimension and the existing negative-value
+  clamp.
+- Added hosted XCTest cases for NaN width and NaN height assignments.
+- Extended static contracts and configuration documentation without changing
+  rating, touch, project, podspec, or workflow behavior.
 
 ## Verification Completed
 
-Pending implementation and verification.
+- All four Make gates passed locally and reported that `xcodebuild` was
+  unavailable, so only the static iOS baseline ran on this host.
+- `python3 -m py_compile scripts/check-baseline.py`, `sh -n build.sh`,
+  `ruby -c iHeartRating.podspec`, and `git diff --check` passed.
+- Five isolated hostile mutations were rejected: removed width normalization,
+  removed height normalization, removed XCTest coverage, stale plan status, and
+  missing verification evidence.
+- Exact-base comparison confirmed Xcode projects, podspecs, assets, and hosted
+  workflow configuration remained unchanged.
+- Intended-file generated-artifact and secret-pattern scans passed.
+- Hosted macOS XCTest and CodeQL evidence is recorded separately after push;
+  this plan claims only the completed local static verification.

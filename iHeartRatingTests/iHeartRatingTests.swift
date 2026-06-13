@@ -86,6 +86,19 @@ class iHeartRatingTests: XCTestCase {
         XCTAssert(hrv.minImageSize.height == 0)
     }
 
+    func testMinImageSizeDoesNotStayNaN() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        let nan = CGFloat(Float(0.0) / Float(0.0))
+
+        hrv.minImageSize = CGSize(width: nan, height: 12)
+        XCTAssert(hrv.minImageSize.width == 0)
+        XCTAssert(hrv.minImageSize.height == 12)
+
+        hrv.minImageSize = CGSize(width: 15, height: nan)
+        XCTAssert(hrv.minImageSize.width == 15)
+        XCTAssert(hrv.minImageSize.height == 0)
+    }
+
     func testLayoutUsesLocalBoundsWhenViewIsScaled() {
         UIGraphicsBeginImageContextWithOptions(CGSize(width: 20, height: 20), false, 1)
         let image = UIGraphicsGetImageFromCurrentImageContext()

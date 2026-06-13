@@ -84,6 +84,8 @@ An incomplete image pair renders no full overlays: clearing either image hides
 filled ratings and removes stale masks until both images are configured again.
 NaN programmatic ratings fall back to `minRating` before mask rendering or
 bounce animation indexing.
+NaN `minImageSize` dimensions normalize independently to zero while valid
+companion dimensions are preserved.
 
 The pinned, credential-free GitHub Actions check runs `make check` on
 `macos-15`. When Xcode is available, the baseline parses both

@@ -28,6 +28,7 @@ Priority:
 - Keep child image geometry in the rating view's local bounds coordinate space
 - Hide full overlays whenever an incomplete image pair is configured
 - Normalize NaN rating assignments before rendering and animation indexing
+- Normalize NaN `minImageSize` dimensions before image layout
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
 - Keep pinned, credential-free macOS CI parsing both Xcode projects through the
