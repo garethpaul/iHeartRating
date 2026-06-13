@@ -22,6 +22,7 @@ IMAGE_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-09-rating-image-layout-invalidati
 HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
 NAN_RATING_PLAN = ROOT / "docs/plans/2026-06-10-nan-rating-boundary.md"
 BOUNDS_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-12-bounds-based-image-layout.md"
+INCOMPLETE_IMAGE_PLAN = ROOT / "docs/plans/2026-06-13-incomplete-image-pair.md"
 
 
 def require(condition, message, failures):
@@ -104,6 +105,7 @@ def main():
         "docs/plans/2026-06-10-hosted-project-validation.md",
         "docs/plans/2026-06-10-nan-rating-boundary.md",
         "docs/plans/2026-06-12-bounds-based-image-layout.md",
+        "docs/plans/2026-06-13-incomplete-image-pair.md",
     ]
 
     for relative_path in required_files:
@@ -137,6 +139,12 @@ def main():
 
     rating_view = read("iHeartRating/iHeartRatingView.swift")
     tests = read("iHeartRatingTests/iHeartRatingTests.swift")
+    refresh_body = rating_view.split("func refresh() {", 1)[1].split("// MARK: Layout helper classes", 1)[0]
+    incomplete_image_branch = re.search(
+        r"if self\.emptyImage == nil \|\| self\.fullImage == nil \{(?P<body>.*?)\n\s*return\s*\n\s*\}",
+        refresh_body,
+        re.DOTALL,
+    )
     require(rating_view.count("let maxImageWidth =") == 1,
             "layoutSubviews must declare maxImageWidth once",
             failures)
@@ -206,11 +214,21 @@ def main():
     require(rating_view.count("if touches.isEmpty") >= 3,
             "touchesBegan, touchesMoved, and touchesEnded must all guard empty touch sets",
             failures)
+    require(incomplete_image_branch is not None and
+            "for imageView in self.fullImageViews" in incomplete_image_branch.group("body") and
+            "imageView.layer.mask = nil" in incomplete_image_branch.group("body") and
+            "imageView.hidden = true" in incomplete_image_branch.group("body"),
+            "refresh must clear and hide full overlays before returning for an incomplete image pair",
+            failures)
     require("testMaxRatingDoesNotStayBelowOne" in tests and "testZeroSizeImageReturnsZeroSize" in tests and
             "testRatingDoesNotExceedMaxRating" in tests and "testMinRatingDoesNotExceedMaxRating" in tests and
             "testNaNRatingFallsBackToMinRating" in tests and "Float(0.0) / Float(0.0)" in tests and
             "testMinImageSizeDoesNotStayNegative" in tests and
             "testLayoutUsesLocalBoundsWhenViewIsScaled" in tests and
+            "testIncompleteImagePairHidesAndRestoresFullImages" in tests and
+            "XCTAssertTrue(firstFullImageView.hidden)" in tests and
+            "XCTAssertNil(firstFullImageView.layer.mask)" in tests and
+            tests.count("XCTAssertFalse(firstFullImageView.hidden)") == 2 and
             "CGAffineTransformMakeScale(2, 2)" in tests and
             "hrv.bounds.size.width == 100" in tests and
             "testTouchesEndedDoesNotNotifyWhenNotEditable" in tests and
@@ -253,6 +271,7 @@ def main():
     hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
     nan_rating_plan = NAN_RATING_PLAN.read_text(encoding="utf-8") if NAN_RATING_PLAN.exists() else ""
     bounds_layout_plan = BOUNDS_LAYOUT_PLAN.read_text(encoding="utf-8") if BOUNDS_LAYOUT_PLAN.exists() else ""
+    incomplete_image_plan = INCOMPLETE_IMAGE_PLAN.read_text(encoding="utf-8") if INCOMPLETE_IMAGE_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
     require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
             "Makefile must expose lint, test, and build aliases for the local baseline",
@@ -266,14 +285,23 @@ def main():
     require("non-editable began/moved touch" in readme,
             "README must document non-editable began/moved touch guards",
             failures)
+    require("incomplete image pair" in readme.lower(),
+            "README must document fail-closed rendering for incomplete image pairs",
+            failures)
     require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and "make build" in vision and "rating" in vision.lower() and "bounce" in vision.lower() and "non-editable" in vision.lower() and "empty touch" in vision.lower() and "empty began/moved touch" in vision.lower() and "minImageSize" in vision and "image layout invalidation" in vision and "local bounds" in vision.lower(),
             "VISION must describe baseline validation for rating behavior",
             failures)
     require("non-editable began/moved touch" in vision,
             "VISION must describe non-editable began/moved touch guards",
             failures)
+    require("incomplete image pair" in vision.lower(),
+            "VISION must describe fail-closed rendering for incomplete image pairs",
+            failures)
     require("malformed configuration" in security and "make check" in security and "non-editable" in security and "empty touch" in security.lower() and "minImageSize" in security and "image layout invalidation" in security and "local bounds" in security.lower(),
             "SECURITY must document configuration hardening and verification",
+            failures)
+    require("incomplete image pair" in security.lower(),
+            "SECURITY must document incomplete image-pair hardening",
             failures)
     require("zero-size" in changes and "maxRating" in changes and "podspec" in changes and "rating bounds" in changes and "bounce" in changes and "not editable" in changes and "empty touch" in changes.lower() and "minImageSize" in changes and "image layout invalidation" in changes and "local bounds" in changes.lower() and "make lint" in changes and "make test" in changes and "make build" in changes,
             "CHANGES must record rating edge-case, rating bounds, and podspec updates",
@@ -283,6 +311,9 @@ def main():
             failures)
     require("non-editable began/moved touch" in changes,
             "CHANGES must record non-editable began/moved touch guards",
+            failures)
+    require("incomplete image pair" in changes.lower(),
+            "CHANGES must record incomplete image-pair rendering behavior",
             failures)
     require("status: completed" in baseline_plan and "status: completed" in rating_bounds_plan and "status: completed" in bounce_plan,
             "plans must be marked completed",
@@ -313,6 +344,11 @@ def main():
             failures)
     require("status: completed" in nan_rating_plan and "make check" in nan_rating_plan,
             "NaN rating boundary plan must be completed and document verification",
+            failures)
+    require("status: completed" in incomplete_image_plan and
+            "All four Make gates" in incomplete_image_plan and
+            "hostile mutations" in incomplete_image_plan.lower(),
+            "incomplete image pair plan must record completed status and actual verification",
             failures)
     bounds_layout_statuses = re.findall(
         r"^status: .+$", bounds_layout_plan, flags=re.MULTILINE

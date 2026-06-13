@@ -189,6 +189,14 @@ public class HeartRatingView: UIView {
     }
     
     func refresh() {
+        if self.emptyImage == nil || self.fullImage == nil {
+            for imageView in self.fullImageViews {
+                imageView.layer.mask = nil
+                imageView.hidden = true
+            }
+            return
+        }
+
         for i in 0..<self.fullImageViews.count {
             let imageView = self.fullImageViews[i]
             

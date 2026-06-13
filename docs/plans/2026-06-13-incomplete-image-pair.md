@@ -1,6 +1,6 @@
 # Incomplete Rating Image Pair
 
-status: planned
+status: completed
 
 ## Context
 
@@ -68,3 +68,17 @@ stored rating or rebuilding image views.
 - `git diff --check`
 - Hostile mutations removing the nil guard, mask cleanup, early return,
   regression test, plan status, or verification evidence must be rejected.
+
+## Verification Completed
+
+- All four Make gates (`make lint`, `make test`, `make build`, and
+  `make check`) passed against the completed implementation and plan.
+- `python3 -m py_compile scripts/check-baseline.py`, `sh -n build.sh`, both
+  `ruby -c` podspec checks, and `git diff --check` passed.
+- A prepared baseline passed and eight hostile mutations were rejected. The
+  mutations removed either side of the nil guard, mask cleanup, overlay hiding,
+  the early return, the regression test, the stale-mask assertion, or completed
+  plan status or required verification evidence.
+- `xcodebuild` was unavailable on this Linux host, so the legacy Swift 2 XCTest
+  suite was not executed locally. The canonical baseline reported the static
+  iOS-only limitation rather than claiming simulator coverage.

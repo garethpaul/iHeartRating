@@ -80,6 +80,8 @@ It also keeps image layout invalidation in the rating image setters so runtime
 image changes recalculate frames before masks refresh.
 Rating image geometry is calculated from the view's local bounds so transforms
 do not inflate or misalign child images.
+An incomplete image pair renders no full overlays: clearing either image hides
+filled ratings and removes stale masks until both images are configured again.
 NaN programmatic ratings fall back to `minRating` before mask rendering or
 bounce animation indexing.
 
@@ -108,6 +110,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   refresh work runs.
 - Rating image layout should use local bounds rather than transformed frame
   dimensions.
+- An incomplete image pair should hide full overlays and clear stale masks
+  until both rating images are configured.
 
 ## Maintenance Notes
 
@@ -128,6 +132,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   normalization.
 - See `docs/plans/2026-06-12-bounds-based-image-layout.md` for transformed-view
   layout correctness.
+- See `docs/plans/2026-06-13-incomplete-image-pair.md` for fail-closed image-pair
+  rendering.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, podspecs, plist/storyboard files, or build scripts.
 
