@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Normalized NaN `minImageSize` width and height independently to zero while
+  preserving valid companion dimensions.
 - Made incomplete image pair configuration hide full rating overlays and clear
   stale masks until both images are configured again.
 
