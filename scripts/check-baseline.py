@@ -25,6 +25,7 @@ BOUNDS_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-12-bounds-based-image-layout.md"
 INCOMPLETE_IMAGE_PLAN = ROOT / "docs/plans/2026-06-13-incomplete-image-pair.md"
 NAN_MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-13-nan-min-image-size.md"
 INFINITE_MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-13-infinite-min-image-size.md"
+LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
 
 
 def require(condition, message, failures):
@@ -110,6 +111,7 @@ def main():
         "docs/plans/2026-06-13-incomplete-image-pair.md",
         "docs/plans/2026-06-13-nan-min-image-size.md",
         "docs/plans/2026-06-13-infinite-min-image-size.md",
+        "docs/plans/2026-06-13-location-independent-make.md",
     ]
 
     for relative_path in required_files:
@@ -296,10 +298,17 @@ def main():
     incomplete_image_plan = INCOMPLETE_IMAGE_PLAN.read_text(encoding="utf-8") if INCOMPLETE_IMAGE_PLAN.exists() else ""
     nan_min_image_size_plan = NAN_MIN_IMAGE_SIZE_PLAN.read_text(encoding="utf-8") if NAN_MIN_IMAGE_SIZE_PLAN.exists() else ""
     infinite_min_image_size_plan = INFINITE_MIN_IMAGE_SIZE_PLAN.read_text(encoding="utf-8") if INFINITE_MIN_IMAGE_SIZE_PLAN.exists() else ""
+    location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
     require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
             "Makefile must expose lint, test, and build aliases for the local baseline",
             failures)
+    require("ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile and '@python3 "$(ROOT)/scripts/check-baseline.py"' in makefile,
+            "Makefile must invoke the checker through the loaded checkout root", failures)
+    require("absolute Makefile path" in readme and "any working directory" in readme,
+            "README must document location-independent verification", failures)
+    require("Make verification target derive the checkout root" in changes and "external directories" in changes,
+            "CHANGES must record location-independent verification", failures)
     require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "build.sh" in readme and "podspec" in readme and "delegate-independent bounce" in readme and "non-editable" in readme and "empty touch" in readme.lower() and "minImageSize" in readme and "image layout invalidation" in readme and "local bounds" in readme.lower(),
             "README must document static verification, build script, and podspec expectations",
             failures)
@@ -441,6 +450,12 @@ def main():
                           re.IGNORECASE) is None,
             "infinite minImageSize plan must record completed status and actual local verification",
             failures)
+    location_statuses = re.findall(r"^status: .+$", location_independent_make_plan, flags=re.MULTILINE)
+    location_sections = location_independent_make_plan.split("## Verification Completed\n", 1)
+    location_verification = location_sections[1] if len(location_sections) == 2 else ""
+    location_required = ("Root and external-directory Make gates passed", "root-derivation mutation failed", "checker-invocation mutation failed", "plan-status mutation failed", "plan-evidence mutation failed", "documentation mutation failed")
+    require(location_statuses == ["status: completed"] and all(item in location_verification for item in location_required) and re.search(r"\b(?:pending|todo|tbd|not run)\b", location_verification, re.IGNORECASE) is None,
+            "location-independent Make plan must record completed verification", failures)
     bounds_layout_statuses = re.findall(
         r"^status: .+$", bounds_layout_plan, flags=re.MULTILINE
     )

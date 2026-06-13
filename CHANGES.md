@@ -2,6 +2,8 @@
 
 ## 2026-06-13
 
+- Made every Make verification target derive the checkout root so the static
+  rating-view baseline works from external directories.
 - Normalized infinite `minImageSize` width and height independently to zero
   while preserving valid companion dimensions.
 - Normalized NaN `minImageSize` width and height independently to zero while
