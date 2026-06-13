@@ -38,6 +38,8 @@ Helpful reports include:
   for bounce animation indexing.
 - NaN `minImageSize` dimensions must normalize to zero before layout geometry is
   calculated.
+- Infinite `minImageSize` dimensions must normalize to zero before layout
+  geometry is calculated.
 - Runtime image changes should keep image layout invalidation before mask refreshes.
 - Transformed rating views should calculate child geometry from local bounds,
   avoiding oversized or misaligned interactive regions.

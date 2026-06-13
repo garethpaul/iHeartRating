@@ -4,6 +4,7 @@
 //
 
 import UIKit
+import Darwin
 
 @objc public protocol HeartRatingViewDelegate {
     /**
@@ -118,12 +119,15 @@ public class HeartRatingView: UIView {
      */
     @IBInspectable public var minImageSize: CGSize = CGSize(width: 5.0, height: 5.0) {
         didSet {
-            if minImageSize.width != minImageSize.width ||
-                minImageSize.height != minImageSize.height ||
-                minImageSize.width < 0 || minImageSize.height < 0 {
+            let widthIsInvalid = minImageSize.width != minImageSize.width ||
+                isinf(Double(minImageSize.width)) || minImageSize.width < 0
+            let heightIsInvalid = minImageSize.height != minImageSize.height ||
+                isinf(Double(minImageSize.height)) || minImageSize.height < 0
+
+            if widthIsInvalid || heightIsInvalid {
                 minImageSize = CGSize(
-                    width: minImageSize.width != minImageSize.width ? CGFloat(0.0) : max(CGFloat(0.0), minImageSize.width),
-                    height: minImageSize.height != minImageSize.height ? CGFloat(0.0) : max(CGFloat(0.0), minImageSize.height)
+                    width: widthIsInvalid ? CGFloat(0.0) : minImageSize.width,
+                    height: heightIsInvalid ? CGFloat(0.0) : minImageSize.height
                 )
             }
             self.setNeedsLayout()

@@ -99,6 +99,24 @@ class iHeartRatingTests: XCTestCase {
         XCTAssert(hrv.minImageSize.height == 0)
     }
 
+    func testMinImageSizeDoesNotStayPositiveInfinity() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        let infinity = CGFloat(1.0) / CGFloat(0.0)
+
+        hrv.minImageSize = CGSize(width: infinity, height: 12)
+        XCTAssert(hrv.minImageSize.width == 0)
+        XCTAssert(hrv.minImageSize.height == 12)
+    }
+
+    func testMinImageSizeDoesNotStayNegativeInfinity() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+        let negativeInfinity = CGFloat(-1.0) / CGFloat(0.0)
+
+        hrv.minImageSize = CGSize(width: 15, height: negativeInfinity)
+        XCTAssert(hrv.minImageSize.width == 15)
+        XCTAssert(hrv.minImageSize.height == 0)
+    }
+
     func testLayoutUsesLocalBoundsWhenViewIsScaled() {
         UIGraphicsBeginImageContextWithOptions(CGSize(width: 20, height: 20), false, 1)
         let image = UIGraphicsGetImageFromCurrentImageContext()
