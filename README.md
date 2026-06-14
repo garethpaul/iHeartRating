@@ -88,6 +88,8 @@ NaN `minImageSize` dimensions normalize independently to zero while valid
 companion dimensions are preserved.
 Infinite `minImageSize` dimensions normalize independently to zero while valid
 companion dimensions are preserved.
+`imageContentMode` changes propagate to every existing image view so already
+created empty and full image pairs stay synchronized with the configured mode.
 
 The pinned, credential-free GitHub Actions check runs `make check` on
 `macos-15`. When Xcode is available, the baseline parses both

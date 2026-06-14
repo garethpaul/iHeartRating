@@ -133,6 +133,18 @@ class iHeartRatingTests: XCTestCase {
         XCTAssert(abs(firstImageView.frame.size.width - 20) < 0.001)
     }
 
+    func testImageContentModeUpdatesExistingImageViews() {
+        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
+
+        hrv.imageContentMode = UIViewContentMode.ScaleAspectFill
+
+        XCTAssert(hrv.subviews.count == 10)
+        for subview in hrv.subviews {
+            let imageView = subview as! UIImageView
+            XCTAssert(imageView.contentMode == UIViewContentMode.ScaleAspectFill)
+        }
+    }
+
     func testIncompleteImagePairHidesAndRestoresFullImages() {
         UIGraphicsBeginImageContextWithOptions(CGSize(width: 20, height: 20), false, 1)
         let image = UIGraphicsGetImageFromCurrentImageContext()

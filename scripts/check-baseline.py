@@ -26,6 +26,7 @@ INCOMPLETE_IMAGE_PLAN = ROOT / "docs/plans/2026-06-13-incomplete-image-pair.md"
 NAN_MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-13-nan-min-image-size.md"
 INFINITE_MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-13-infinite-min-image-size.md"
 LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
+IMAGE_CONTENT_MODE_PLAN = ROOT / "docs/plans/2026-06-14-image-content-mode-propagation.md"
 
 
 def require(condition, message, failures):
@@ -112,6 +113,7 @@ def main():
         "docs/plans/2026-06-13-nan-min-image-size.md",
         "docs/plans/2026-06-13-infinite-min-image-size.md",
         "docs/plans/2026-06-13-location-independent-make.md",
+        "docs/plans/2026-06-14-image-content-mode-propagation.md",
     ]
 
     for relative_path in required_files:
@@ -233,6 +235,18 @@ def main():
     require(rating_view.count("if touches.isEmpty") >= 3,
             "touchesBegan, touchesMoved, and touchesEnded must all guard empty touch sets",
             failures)
+    content_mode_observer = re.search(
+        r"var imageContentMode: UIViewContentMode = UIViewContentMode\.ScaleAspectFit \{(?P<body>.*?)\n    \}",
+        rating_view,
+        re.DOTALL,
+    )
+    require(content_mode_observer is not None and
+            "for imageView in self.emptyImageViews" in content_mode_observer.group("body") and
+            "for imageView in self.fullImageViews" in content_mode_observer.group("body") and
+            content_mode_observer.group("body").count("imageView.contentMode = imageContentMode") == 2 and
+            "self.setNeedsLayout()" in content_mode_observer.group("body"),
+            "imageContentMode changes must update every existing image view and request layout",
+            failures)
     require(incomplete_image_branch is not None and
             "for imageView in self.fullImageViews" in incomplete_image_branch.group("body") and
             "imageView.layer.mask = nil" in incomplete_image_branch.group("body") and
@@ -249,6 +263,10 @@ def main():
             "XCTAssert(hrv.minImageSize.width == 15)" in tests and
             "testMinImageSizeDoesNotStayNegative" in tests and
             "testLayoutUsesLocalBoundsWhenViewIsScaled" in tests and
+            "testImageContentModeUpdatesExistingImageViews" in tests and
+            "hrv.imageContentMode = UIViewContentMode.ScaleAspectFill" in tests and
+            "XCTAssert(hrv.subviews.count == 10)" in tests and
+            "XCTAssert(imageView.contentMode == UIViewContentMode.ScaleAspectFill)" in tests and
             "testIncompleteImagePairHidesAndRestoresFullImages" in tests and
             "XCTAssertTrue(firstFullImageView.hidden)" in tests and
             "XCTAssertNil(firstFullImageView.layer.mask)" in tests and
@@ -299,6 +317,7 @@ def main():
     nan_min_image_size_plan = NAN_MIN_IMAGE_SIZE_PLAN.read_text(encoding="utf-8") if NAN_MIN_IMAGE_SIZE_PLAN.exists() else ""
     infinite_min_image_size_plan = INFINITE_MIN_IMAGE_SIZE_PLAN.read_text(encoding="utf-8") if INFINITE_MIN_IMAGE_SIZE_PLAN.exists() else ""
     location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
+    image_content_mode_plan = IMAGE_CONTENT_MODE_PLAN.read_text(encoding="utf-8") if IMAGE_CONTENT_MODE_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
     require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
             "Makefile must expose lint, test, and build aliases for the local baseline",
@@ -359,6 +378,15 @@ def main():
             failures)
     require("incomplete image pair" in changes.lower(),
             "CHANGES must record incomplete image-pair rendering behavior",
+            failures)
+    content_mode_guidance = "imageContentMode changes propagate to every existing image view"
+    normalized_guidance = [
+        " ".join(document.replace("`", "").split())
+        for document in [readme, vision, security, changes, read("AGENTS.md")]
+    ]
+    require(all(content_mode_guidance in document
+                for document in normalized_guidance),
+            "project guidance must document image content-mode propagation",
             failures)
     require("status: completed" in baseline_plan and "status: completed" in rating_bounds_plan and "status: completed" in bounce_plan,
             "plans must be marked completed",
@@ -456,6 +484,33 @@ def main():
     location_required = ("Root and external-directory Make gates passed", "root-derivation mutation failed", "checker-invocation mutation failed", "plan-status mutation failed", "plan-evidence mutation failed", "documentation mutation failed")
     require(location_statuses == ["status: completed"] and all(item in location_verification for item in location_required) and re.search(r"\b(?:pending|todo|tbd|not run)\b", location_verification, re.IGNORECASE) is None,
             "location-independent Make plan must record completed verification", failures)
+    image_content_mode_statuses = re.findall(
+        r"^status: .+$", image_content_mode_plan, flags=re.MULTILINE
+    )
+    image_content_mode_sections = image_content_mode_plan.split(
+        "## Verification Completed\n", 1
+    )
+    image_content_mode_verification = (
+        image_content_mode_sections[1]
+        if len(image_content_mode_sections) == 2 else ""
+    )
+    image_content_mode_required = (
+        "All four Make gates",
+        "absolute Makefile check",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "sh -n build.sh",
+        "Both podspec syntax checks",
+        "Four isolated hostile mutations",
+        "git diff --check",
+    )
+    require(image_content_mode_statuses == ["status: completed"]
+            and all(item in image_content_mode_verification
+                    for item in image_content_mode_required)
+            and re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                          image_content_mode_verification,
+                          re.IGNORECASE) is None,
+            "image content-mode propagation plan must record completed verification",
+            failures)
     bounds_layout_statuses = re.findall(
         r"^status: .+$", bounds_layout_plan, flags=re.MULTILINE
     )

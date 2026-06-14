@@ -47,6 +47,7 @@
 - UI configuration changes should not crash on empty image arrays, single-rating views, zero-sized images, negative `minImageSize`, invalid `maxRating`, inconsistent rating bounds, or out-of-range ratings.
 - Keep rating image layout in local bounds coordinates so transforms do not
   distort child geometry.
+- Ensure `imageContentMode` changes propagate to every existing image view.
 - This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
