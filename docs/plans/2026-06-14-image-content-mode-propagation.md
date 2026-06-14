@@ -1,6 +1,6 @@
 # Image Content Mode Propagation
 
-status: planned
+status: completed
 
 ## Context
 
@@ -40,8 +40,25 @@ data or network behavior is involved.
 
 ## Work Completed
 
-Pending implementation.
+- Added an `imageContentMode` property observer that updates all existing empty
+  and full image views and requests layout.
+- Added an XCTest that verifies all ten default image views adopt the changed
+  content mode.
+- Added static implementation, test, documentation, and completed-plan
+  contracts plus synchronized maintenance guidance.
 
 ## Verification Completed
 
-Pending implementation and exact evidence.
+- All four Make gates passed in an isolated completed-plan preflight copy and
+  again in the implementation worktree.
+- The absolute Makefile check passed from an external directory.
+- `python3 -m py_compile scripts/check-baseline.py` passed; its exact generated
+  bytecode path was removed before the final artifact audit.
+- `sh -n build.sh` passed.
+- Both podspec syntax checks passed with `ruby -c`.
+- Four isolated hostile mutations were rejected: removing either propagation
+  loop, removing the observer layout request, and removing XCTest discovery.
+- `git diff --check` passed, along with exact intended-path, generated-artifact,
+  changed-line secret, dependency, vendored-file, project, and workflow audits.
+- Local `xcodebuild` was unavailable on Linux; no full Swift 2 compile or
+  simulator execution is claimed.

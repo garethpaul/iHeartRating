@@ -70,7 +70,17 @@ public class HeartRatingView: UIView {
     /**
      Sets the empty and full image view content mode.
      */
-    var imageContentMode: UIViewContentMode = UIViewContentMode.ScaleAspectFit
+    var imageContentMode: UIViewContentMode = UIViewContentMode.ScaleAspectFit {
+        didSet {
+            for imageView in self.emptyImageViews {
+                imageView.contentMode = imageContentMode
+            }
+            for imageView in self.fullImageViews {
+                imageView.contentMode = imageContentMode
+            }
+            self.setNeedsLayout()
+        }
+    }
     
     /**
      Minimum rating.

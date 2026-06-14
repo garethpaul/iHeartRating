@@ -40,6 +40,8 @@ Helpful reports include:
   calculated.
 - Infinite `minImageSize` dimensions must normalize to zero before layout
   geometry is calculated.
+- `imageContentMode` changes propagate to every existing image view so rendered
+  children cannot retain stale configuration.
 - Runtime image changes should keep image layout invalidation before mask refreshes.
 - Transformed rating views should calculate child geometry from local bounds,
   avoiding oversized or misaligned interactive regions.

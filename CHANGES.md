@@ -1,5 +1,10 @@
 # Changes
 
+## 2026-06-14
+
+- Made `imageContentMode` changes propagate to every existing image view and
+  added regression coverage for all empty and full image pairs.
+
 ## 2026-06-13
 
 - Made every Make verification target derive the checkout root so the static

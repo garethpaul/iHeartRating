@@ -30,6 +30,7 @@ Priority:
 - Normalize NaN rating assignments before rendering and animation indexing
 - Normalize NaN `minImageSize` dimensions before image layout
 - Normalize infinite `minImageSize` dimensions before image layout
+- Ensure `imageContentMode` changes propagate to every existing image view
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
 - Keep pinned, credential-free macOS CI parsing both Xcode projects through the
