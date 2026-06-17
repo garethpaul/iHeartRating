@@ -48,6 +48,7 @@
 - Keep rating image layout in local bounds coordinates so transforms do not
   distort child geometry.
 - Ensure `imageContentMode` changes propagate to every existing image view.
+- External consumers can configure the public `imageContentMode` property while its existing observer keeps every rating image synchronized.
 - This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.

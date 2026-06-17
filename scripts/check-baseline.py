@@ -27,6 +27,7 @@ NAN_MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-13-nan-min-image-size.md"
 INFINITE_MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-13-infinite-min-image-size.md"
 LOCATION_INDEPENDENT_MAKE_PLAN = ROOT / "docs/plans/2026-06-13-location-independent-make.md"
 IMAGE_CONTENT_MODE_PLAN = ROOT / "docs/plans/2026-06-14-image-content-mode-propagation.md"
+PUBLIC_IMAGE_CONTENT_MODE_PLAN = ROOT / "docs/plans/2026-06-17-public-image-content-mode.md"
 
 
 def require(condition, message, failures):
@@ -114,6 +115,7 @@ def main():
         "docs/plans/2026-06-13-infinite-min-image-size.md",
         "docs/plans/2026-06-13-location-independent-make.md",
         "docs/plans/2026-06-14-image-content-mode-propagation.md",
+        "docs/plans/2026-06-17-public-image-content-mode.md",
     ]
 
     for relative_path in required_files:
@@ -191,6 +193,10 @@ def main():
             "func testMinImageSizeDoesNotStayPositiveInfinity()" in tests and
             "func testMinImageSizeDoesNotStayNegativeInfinity()" in tests,
             "minImageSize must normalize infinite width and height independently",
+            failures)
+    require("public var imageContentMode: UIViewContentMode = UIViewContentMode.ScaleAspectFit" in rating_view and
+            "@IBInspectable public var imageContentMode" not in rating_view,
+            "imageContentMode must remain a public non-IBInspectable consumer API",
             failures)
     require(re.search(r"@IBInspectable public var emptyImage: UIImage\? \{.*?didSet \{.*?self\.setNeedsLayout\(\).*?self\.refresh\(\)", rating_view, re.DOTALL),
             "emptyImage changes must invalidate layout before refreshing masks",
@@ -318,6 +324,7 @@ def main():
     infinite_min_image_size_plan = INFINITE_MIN_IMAGE_SIZE_PLAN.read_text(encoding="utf-8") if INFINITE_MIN_IMAGE_SIZE_PLAN.exists() else ""
     location_independent_make_plan = LOCATION_INDEPENDENT_MAKE_PLAN.read_text(encoding="utf-8") if LOCATION_INDEPENDENT_MAKE_PLAN.exists() else ""
     image_content_mode_plan = IMAGE_CONTENT_MODE_PLAN.read_text(encoding="utf-8") if IMAGE_CONTENT_MODE_PLAN.exists() else ""
+    public_image_content_mode_plan = PUBLIC_IMAGE_CONTENT_MODE_PLAN.read_text(encoding="utf-8") if PUBLIC_IMAGE_CONTENT_MODE_PLAN.exists() else ""
     workflow = read(".github/workflows/check.yml")
     require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
             "Makefile must expose lint, test, and build aliases for the local baseline",
@@ -510,6 +517,39 @@ def main():
                           image_content_mode_verification,
                           re.IGNORECASE) is None,
             "image content-mode propagation plan must record completed verification",
+            failures)
+    public_image_content_mode_guidance = "External consumers can configure the public `imageContentMode` property while its existing observer keeps every rating image synchronized."
+    require(all(public_image_content_mode_guidance in document for document in
+                [read("AGENTS.md"), readme, security, vision, changes]),
+            "Docs must record the public imageContentMode consumer contract",
+            failures)
+    public_image_content_mode_statuses = re.findall(
+        r"^status: .+$", public_image_content_mode_plan, flags=re.MULTILINE
+    )
+    public_image_content_mode_sections = public_image_content_mode_plan.split(
+        "## Verification Completed\n", 1
+    )
+    public_image_content_mode_verification = (
+        public_image_content_mode_sections[1]
+        if len(public_image_content_mode_sections) == 2 else ""
+    )
+    public_image_content_mode_required = (
+        "All four Make gates passed",
+        "external-directory absolute Makefile check passed from `/tmp`",
+        "`xcodebuild` was unavailable locally",
+        "python3 -m py_compile scripts/check-baseline.py",
+        "sh -n build.sh",
+        "podspec syntax checks",
+        "git diff --check",
+        "Seven isolated hostile mutations were rejected",
+    )
+    require(public_image_content_mode_statuses == ["status: completed"] and
+            all(item in public_image_content_mode_verification
+                    for item in public_image_content_mode_required) and
+            re.search(r"\b(?:pending|todo|tbd|not run)\b",
+                      public_image_content_mode_verification,
+                      re.IGNORECASE) is None,
+            "public imageContentMode plan must record completed verification",
             failures)
     bounds_layout_statuses = re.findall(
         r"^status: .+$", bounds_layout_plan, flags=re.MULTILINE

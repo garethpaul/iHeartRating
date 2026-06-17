@@ -2,7 +2,7 @@
 title: "fix: Expose image content mode to library consumers"
 type: fix
 date: 2026-06-17
-status: planned
+status: completed
 ---
 
 # fix: Expose image content mode to library consumers
@@ -72,3 +72,25 @@ though an external CocoaPods or framework consumer cannot assign the property.
 
 - `docs/plans/2026-06-14-image-content-mode-propagation.md` established the
   observer behavior this change exposes to consumers.
+
+## Work Completed
+
+- Made the existing `imageContentMode` property publicly readable and writable
+  without changing its type, default, observer, or child-view behavior.
+- Added a maintained source contract that distinguishes public API access from
+  the legacy XCTest target's `@testable` visibility.
+- Synchronized consumer and maintainer guidance without expanding the
+  Interface Builder, deployment, or package-version surface.
+
+## Verification Completed
+
+- All four Make gates passed: `make lint`, `make test`, `make build`, and
+  `make check`.
+- The external-directory absolute Makefile check passed from `/tmp`.
+- `xcodebuild` was unavailable locally, so the maintained static source,
+  project, plist, workflow, podspec, documentation, and plan contracts ran.
+- `python3 -m py_compile scripts/check-baseline.py`, `sh -n build.sh`, both
+  podspec syntax checks, and `git diff --check` passed.
+- Seven isolated hostile mutations were rejected for public access, the
+  default mode, Interface Builder exposure, observer propagation, guidance,
+  plan status, and plan evidence.

@@ -42,6 +42,7 @@ Helpful reports include:
   geometry is calculated.
 - `imageContentMode` changes propagate to every existing image view so rendered
   children cannot retain stale configuration.
+- External consumers can configure the public `imageContentMode` property while its existing observer keeps every rating image synchronized.
 - Runtime image changes should keep image layout invalidation before mask refreshes.
 - Transformed rating views should calculate child geometry from local bounds,
   avoiding oversized or misaligned interactive regions.

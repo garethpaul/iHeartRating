@@ -1,5 +1,9 @@
 # Changes
 
+## 2026-06-17
+
+- External consumers can configure the public `imageContentMode` property while its existing observer keeps every rating image synchronized.
+
 ## 2026-06-14
 
 - Made `imageContentMode` changes propagate to every existing image view and
