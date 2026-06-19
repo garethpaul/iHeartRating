@@ -31,8 +31,9 @@ Helpful reports include:
 - No primary dependency manifest was detected in the repository root. If dependencies are added later, include a manifest and prefer reproducible installation instructions.
 - `make check` runs a static baseline for malformed configuration hardening, CocoaPods metadata, plist/storyboard parsing, build-script syntax, rating bounds, and rating-view edge cases when Xcode is unavailable.
 - The pinned macOS workflow uses read-only repository permissions, disables
-  checkout credential persistence, and parses both Xcode projects without
-  signing material or package publication access.
+  checkout credential persistence, runs the simulator XCTest suite, checks the
+  generated Objective-C header, and builds the SampleApp without signing or
+  package publication access.
 - Rating controls should not crash on empty image arrays, single-rating views, zero-sized images, negative `minImageSize`, invalid `maxRating`, inconsistent rating bounds, out-of-range ratings, non-editable touch endings, empty touch endings, or unexpected image assets.
 - NaN ratings must be normalized before mask calculations or integer conversion
   for bounce animation indexing.
@@ -48,6 +49,15 @@ Helpful reports include:
   avoiding oversized or misaligned interactive regions.
 - An incomplete image pair should hide full overlays and remove stale masks
   rather than displaying a rating without its empty-image baseline.
+- Extreme finite dimensions are bounded before multiplication or Core Animation
+  frame assignment so malformed configuration cannot produce non-finite layout.
+- `maxRating` is capped before allocating paired child image views to prevent
+  malformed configuration from causing unbounded memory growth.
+- Complete image pairs expose finite intrinsic sizing for Auto Layout;
+  incomplete pairs expose zero intrinsic size.
+- The control exposes one adjustable accessibility element and keeps its value
+  and traits synchronized with rating and editability changes.
+- `HeartRatingView` follows UIKit's main-thread-only mutation contract.
 
 ## Mobile Privacy Notes
 

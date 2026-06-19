@@ -20,13 +20,14 @@
 
 - Install dependencies: no repository-specific install command is documented.
 - Full baseline: `make check`
+- Executable iOS gate: `make xcode-test`
 - Local Apple development: `open iHeartRating.xcodeproj`
 - If a command above skips because a platform toolchain is missing, verify on a machine with that SDK before claiming platform behavior is tested.
 
 ## Coding conventions
 
 - Language mix noted in the README: Swift (6), C/C++ headers (1), shell (1).
-- Preserve legacy Xcode project settings and signing assumptions unless the change is explicitly about modernization.
+- Preserve the Swift 5, iOS 12, and signing-independent project settings unless a change explicitly updates supported platforms.
 
 ## Testing guidance
 
@@ -39,7 +40,7 @@
 - Keep diffs focused on the requested repository and avoid unrelated modernization or formatting churn.
 - Preserve public APIs, sample behavior, file formats, and documented environment variables unless the task explicitly changes them.
 - Update tests, README notes, or docs/plans when behavior, security posture, or validation commands change.
-- Call out skipped platform validation, legacy toolchain assumptions, and any risky files touched in the final summary.
+- Call out skipped simulator/device/visual validation and any risky files touched in the final summary.
 
 ## Safety and gotchas
 
@@ -49,7 +50,8 @@
   distort child geometry.
 - Ensure `imageContentMode` changes propagate to every existing image view.
 - External consumers can configure the public `imageContentMode` property while its existing observer keeps every rating image synchronized.
-- This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
+- Keep intrinsic sizing, hostile-geometry bounds, accessibility state, and generated Objective-C selectors covered by tests.
+- Treat `HeartRatingView` mutation as main-thread-only UIKit work.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
 - See `docs/plans/2026-06-08-bounce-without-delegate.md` for the bounce-without-delegate guardrail.

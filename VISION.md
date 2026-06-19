@@ -34,14 +34,14 @@ Priority:
 - External consumers can configure the public `imageContentMode` property while its existing observer keeps every rating image synchronized.
 - Keep `make lint`, `make test`, `make build`, and `make check` available as
   local verification gates
-- Keep pinned, credential-free macOS CI parsing both Xcode projects through the
-  canonical `make check` gate
+- Keep pinned, credential-free macOS CI running static contracts, simulator
+  XCTest, Objective-C header checks, and the SampleApp build
 
 Next priorities:
 
-- Modernize Swift/project settings in a dedicated pass
-- Add tests for rating calculations and delegate calls
-- Clarify package-manager support if revived
+- Add visual regression coverage for image spacing and content modes
+- Add spoken VoiceOver and Switch Control device verification
+- Clarify Swift Package Manager support if the library is revived
 
 Contribution rules:
 
@@ -60,10 +60,9 @@ This UI component has low security risk, but it should not crash on malformed
 configuration or unexpected image assets.
 
 Current baseline: `make lint`, `make test`, `make build`, and `make check` run
-`scripts/check-baseline.py` without Xcode. It verifies static project metadata,
-CocoaPods specs, plist/storyboard files, build script syntax, and rating-view
-guards for empty, single-item, zero-size, negative `minImageSize`, invalid
-`maxRating`, inconsistent rating bounds, and out-of-range bounce configurations.
+`scripts/check-baseline.py`. It verifies static project metadata, CocoaPods
+specs, plist/storyboard files, build-script syntax, Objective-C selectors,
+finite geometry, intrinsic sizing, accessibility, and rating-view guards.
 Bounce animation should remain independent of delegate callbacks, and
 non-editable views or empty touch endings should ignore touch-ending delegate
 and bounce work. Empty began/moved touch events should ignore live-update
@@ -75,9 +74,8 @@ Scaled or rotated rating views should continue laying out child images from
 local bounds rather than transformed frame dimensions.
 An incomplete image pair should render without full overlays or stale masks,
 then restore normal rating rendering when both images are configured.
-On macOS, the baseline should also parse both Xcode projects. Full Swift 2
-compilation and simulator testing remain tied to Xcode 7.3 and a compatible
-runtime.
+On macOS, `make xcode-test` runs the Swift 5 XCTest suite on an available iPhone
+simulator, verifies the generated Objective-C header, and builds the SampleApp.
 
 ## What We Will Not Merge (For Now)
 

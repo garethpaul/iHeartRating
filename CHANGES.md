@@ -1,5 +1,23 @@
 # Changes
 
+## 2026-06-19
+
+- Migrated the library, tests, and SampleApp from unbuildable Swift 2 project
+  settings to Swift 5 with an iOS 12 deployment target.
+- Prepared CocoaPods `0.2.0` metadata for the Swift 5/iOS 12 compatibility
+  boundary while preserving external subclassing and Objective-C selectors.
+- Added executable hosted simulator tests and generated Objective-C header
+  checks while preserving the `heartRatingView:didUpdate:` and
+  `heartRatingView:isUpdating:` selectors.
+- Bounded hostile and extreme layout geometry before creating image frames or
+  partial-rating masks, and added stable repeated-layout coverage.
+- Capped `maxRating` at 100 before allocating paired image views.
+- Added intrinsic content sizing for complete image pairs and zero intrinsic
+  size for incomplete pairs.
+- Added synchronized adjustable accessibility label, value, traits, and bounded
+  increment/decrement actions.
+- Updated CocoaPods metadata with the tested iOS and Swift versions.
+
 ## 2026-06-17
 
 - External consumers can configure the public `imageContentMode` property while its existing observer keeps every rating image synchronized.
