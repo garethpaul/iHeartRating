@@ -1,348 +1,197 @@
 #!/usr/bin/env python3
-from pathlib import Path
+
+from __future__ import annotations
+
+import ast
 import plistlib
 import re
 import shutil
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-BASELINE_PLAN = ROOT / "docs/plans/2026-06-08-rating-baseline.md"
-MAKE_GATES_PLAN = ROOT / "docs/plans/2026-06-09-make-gate-aliases.md"
-RATING_BOUNDS_PLAN = ROOT / "docs/plans/2026-06-08-rating-bounds.md"
-BOUNCE_PLAN = ROOT / "docs/plans/2026-06-08-bounce-without-delegate.md"
-NONEDITABLE_PLAN = ROOT / "docs/plans/2026-06-09-noneditable-touch-end.md"
-EMPTY_TOUCH_PLAN = ROOT / "docs/plans/2026-06-09-empty-touch-end.md"
-MIN_IMAGE_SIZE_PLAN = ROOT / "docs/plans/2026-06-09-min-image-size-guard.md"
-EMPTY_TOUCH_PHASE_PLAN = ROOT / "docs/plans/2026-06-09-empty-touch-phase-guard.md"
-NONEDITABLE_TOUCH_PHASE_PLAN = ROOT / "docs/plans/2026-06-09-noneditable-touch-phase-guard.md"
-IMAGE_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-09-rating-image-layout-invalidation.md"
-HOSTED_VALIDATION_PLAN = ROOT / "docs/plans/2026-06-10-hosted-project-validation.md"
-NAN_RATING_PLAN = ROOT / "docs/plans/2026-06-10-nan-rating-boundary.md"
-BOUNDS_LAYOUT_PLAN = ROOT / "docs/plans/2026-06-12-bounds-based-image-layout.md"
 
 
-def require(condition, message, failures):
+def read(relative_path: str) -> str:
+    return (ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def require(condition: bool, message: str, failures: list[str]) -> None:
     if not condition:
         failures.append(message)
 
 
-def read(relative_path):
-    return (ROOT / relative_path).read_text(encoding="utf-8", errors="replace")
-
-
-def parse_xml(relative_path, failures):
-    try:
-        ET.parse(str(ROOT / relative_path))
-    except ET.ParseError as error:
-        failures.append(f"{relative_path} is not well-formed XML: {error}")
-
-
-def parse_plist(relative_path, failures):
-    try:
-        with (ROOT / relative_path).open("rb") as file:
-            return plistlib.load(file)
-    except Exception as error:
-        failures.append(f"{relative_path} is not a readable plist: {error}")
-        return {}
-
-
-def run(command, failures, message):
-    result = subprocess.run(
-        command,
-        cwd=str(ROOT),
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
+def run(command: list[str], message: str, failures: list[str]) -> None:
+    result = subprocess.run(command, cwd=ROOT, capture_output=True, text=True)
     if result.returncode != 0:
-        failures.append(message + "\n" + (result.stderr or result.stdout).strip())
+        failures.append(f"{message}: {result.stderr.strip() or result.stdout.strip()}")
 
 
-def main():
-    failures = []
-    required_files = [
-        ".gitignore",
-        ".github/workflows/check.yml",
-        ".travis.yml",
-        "CHANGES.md",
-        "LICENSE",
-        "Makefile",
-        "README.md",
-        "SECURITY.md",
-        "VISION.md",
-        "build.sh",
-        "iHeartRating.podspec",
-        "iHeartRating/0.1.6/iHeartRating.podspec",
-        "iHeartRating.xcodeproj/project.pbxproj",
-        "iHeartRating/Info.plist",
-        "iHeartRating/iHeartRating.h",
-        "iHeartRating/iHeartRatingView.swift",
-        "iHeartRatingTests/Info.plist",
-        "iHeartRatingTests/iHeartRatingTests.swift",
-        "example/SampleApp/README.md",
-        "example/SampleApp/SampleApp.xcodeproj/project.pbxproj",
-        "example/SampleApp/SampleApp/Info.plist",
-        "example/SampleApp/SampleApp/Base.lproj/Main.storyboard",
-        "example/SampleApp/SampleApp/Base.lproj/LaunchScreen.storyboard",
-        "screenshots/heart_app_example.gif",
-        "assets/logo.png",
-        "assets/storyboard.png",
-        "docs/readme-overview.svg",
-        "docs/plans/2026-06-08-rating-baseline.md",
-        "docs/plans/2026-06-09-make-gate-aliases.md",
-        "docs/plans/2026-06-08-rating-bounds.md",
-        "docs/plans/2026-06-08-bounce-without-delegate.md",
-        "docs/plans/2026-06-09-noneditable-touch-end.md",
-        "docs/plans/2026-06-09-empty-touch-end.md",
-        "docs/plans/2026-06-09-min-image-size-guard.md",
-        "docs/plans/2026-06-09-empty-touch-phase-guard.md",
-        "docs/plans/2026-06-09-noneditable-touch-phase-guard.md",
-        "docs/plans/2026-06-09-rating-image-layout-invalidation.md",
-        "docs/plans/2026-06-10-hosted-project-validation.md",
-        "docs/plans/2026-06-10-nan-rating-boundary.md",
-        "docs/plans/2026-06-12-bounds-based-image-layout.md",
+def main() -> int:
+    failures: list[str] = []
+    source = read("iHeartRating/iHeartRatingView.swift")
+    tests = read("iHeartRatingTests/iHeartRatingTests.swift")
+    library_project = read("iHeartRating.xcodeproj/project.pbxproj")
+    sample_project = read("example/SampleApp/SampleApp.xcodeproj/project.pbxproj")
+    makefile = read("Makefile")
+    build_script = read("build.sh")
+    workflow = read(".github/workflows/check.yml")
+    podspec = read("iHeartRating.podspec")
+
+    require(
+        "@objcMembers" in source and "open class HeartRatingView: UIView" in source,
+        "HeartRatingView must preserve Objective-C exposure and external subclassing",
+        failures,
+    )
+    require(
+        "@objc(heartRatingView:didUpdate:)" in source
+        and "@objc(heartRatingView:isUpdating:)" in source,
+        "delegate selectors must remain stable for Objective-C consumers",
+        failures,
+    )
+    require("public weak var delegate" in source, "delegate ownership must remain weak", failures)
+    require(
+        "public var imageContentMode: UIView.ContentMode" in source
+        and source.count("$0.contentMode = imageContentMode") == 2,
+        "public image content mode must propagate to both child image sets",
+        failures,
+    )
+    require(
+        "public override var intrinsicContentSize" in source
+        and source.count("invalidateIntrinsicContentSize()") >= 4,
+        "image, count, and minimum-size changes must invalidate intrinsic sizing",
+        failures,
+    )
+    require(
+        "private func finiteNonnegative" in source
+        and "private static let maximumSafeDimension" in source
+        and "maximumImageWidth" in source
+        and "maskWidth" in source,
+        "layout and mask geometry must pass through finite bounded normalization",
+        failures,
+    )
+    require(
+        "guard emptyImage != nil, fullImage != nil" in source
+        and "layer.mask = nil" in source
+        and "isHidden = true" in source,
+        "incomplete image pairs must fail closed and clear stale masks",
+        failures,
+    )
+    require(
+        "public override func accessibilityIncrement()" in source
+        and "public override func accessibilityDecrement()" in source
+        and "accessibilityTraits = editable ? [.adjustable] : [.staticText]" in source
+        and 'accessibilityLabel = "Rating"' in source
+        and "if accessibilityLabel == nil" in source,
+        "the rating control must expose synchronized adjustable accessibility state",
+        failures,
+    )
+    require(
+        "guard editable, emptyImage != nil, fullImage != nil" in source
+        and "guard editable, let touch = touches.first" in source
+        and "guard editable, !touches.isEmpty" in source,
+        "touch handling must reject invisible, noneditable, and empty interactions",
+        failures,
+    )
+
+    required_tests = [
+        "testMinimumImageSizeNormalizesEachInvalidDimension",
+        "testMaximumRatingCountIsBoundedBeforeAllocatingImageViews",
+        "testSizeForImageRejectsNonFiniteAndNonPositiveContainers",
+        "testExtremeMinimumImageSizeStillProducesFiniteBoundedFrames",
+        "testRepeatedLayoutKeepsPartialMaskFiniteAndStable",
+        "testIntrinsicContentSizeTracksImagesCountAndMinimumSize",
+        "testIncompleteImagePairHasNoIntrinsicSizeAndHidesOverlays",
+        "testImageContentModePropagatesAndSurvivesImageViewReplacement",
+        "testAccessibilityStateTracksRatingAndEditability",
+        "testAccessibilityAdjustmentsAreBoundedAndNotifyDelegate",
     ]
+    for test_name in required_tests:
+        require(f"func {test_name}()" in tests, f"missing focused XCTest {test_name}", failures)
 
-    for relative_path in required_files:
-        require((ROOT / relative_path).is_file(), f"Required file missing: {relative_path}", failures)
+    require(
+        "private static let maximumRatingCount = 100" in source
+        and "min(max(maxRating, 1), Self.maximumRatingCount)" in source,
+        "maxRating must be bounded before child image view allocation",
+        failures,
+    )
 
-    for xml_file in [
-        "example/SampleApp/SampleApp/Base.lproj/Main.storyboard",
-        "example/SampleApp/SampleApp/Base.lproj/LaunchScreen.storyboard",
-        "docs/readme-overview.svg",
-    ]:
-        parse_xml(xml_file, failures)
+    require(library_project.count("SWIFT_VERSION = 5.0;") == 4, "library and test targets must pin Swift 5", failures)
+    require(sample_project.count("SWIFT_VERSION = 5.0;") == 6, "sample targets must pin Swift 5", failures)
+    require(
+        "IPHONEOS_DEPLOYMENT_TARGET = 9." not in library_project
+        and "IPHONEOS_DEPLOYMENT_TARGET = 9." not in sample_project,
+        "projects must not claim deployment targets unsupported by hosted Xcode",
+        failures,
+    )
+    require('s.version      = "0.2.0"' in podspec, "podspec version must distinguish the Swift 5 platform update", failures)
+    require('s.platform     = :ios, "12.0"' in podspec, "podspec must match the tested iOS deployment target", failures)
+    require('s.swift_version = "5.0"' in podspec, "podspec must declare its Swift language version", failures)
 
-    for plist_file in [
+    require("ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile, "Make targets must be location independent", failures)
+    require(
+        re.search(r"(?m)^xcode-test:\s*$", makefile) is not None
+        and '"$(ROOT)/build.sh"' in makefile,
+        "Makefile must expose the executable Xcode gate",
+        failures,
+    )
+    require("mktemp -d" in build_script and "iHeartRating-Swift.h" in build_script, "Xcode gate must clean temporary output and inspect Objective-C API", failures)
+    require("SampleApp.xcodeproj" in build_script and "iHeartRatingTests" in build_script, "Xcode gate must build the sample and run library tests", failures)
+
+    require(workflow.count("permissions:\n  contents: read") == 1, "workflow permissions must stay read-only", failures)
+    require("persist-credentials: false" in workflow, "checkout credentials must not persist", failures)
+    require("run: make check" in workflow and "run: make xcode-test" in workflow, "hosted checks must execute static and Xcode gates", failures)
+    require("timeout-minutes: 20" in workflow, "hosted Xcode execution must remain time bounded", failures)
+    require(not re.search(r"(?m)^\s+[A-Za-z0-9_-]+:\s*write\s*$", workflow), "workflow must not gain write permissions", failures)
+
+    for relative_path in [
         "iHeartRating/Info.plist",
         "iHeartRatingTests/Info.plist",
         "example/SampleApp/SampleApp/Info.plist",
         "example/SampleApp/SampleAppTests/Info.plist",
         "example/SampleApp/SampleAppUITests/Info.plist",
     ]:
-        parse_plist(plist_file, failures)
+        try:
+            with (ROOT / relative_path).open("rb") as plist_file:
+                plistlib.load(plist_file)
+        except Exception as error:
+            failures.append(f"invalid plist {relative_path}: {error}")
 
-    run(["sh", "-n", "build.sh"], failures, "build.sh must be valid POSIX shell")
+    for relative_path in [
+        "example/SampleApp/SampleApp/Base.lproj/Main.storyboard",
+        "example/SampleApp/SampleApp/Base.lproj/LaunchScreen.storyboard",
+    ]:
+        try:
+            ET.parse(ROOT / relative_path)
+        except Exception as error:
+            failures.append(f"invalid storyboard {relative_path}: {error}")
 
-    build_sh = read("build.sh")
-    require("command -v xcodebuild" in build_sh and "xcodebuild not found" in build_sh,
-            "build.sh must fail clearly when Xcode is unavailable",
-            failures)
-    require("ci_lib()" in build_sh and "function ci_lib" not in build_sh,
-            "build.sh must use POSIX function syntax",
-            failures)
-
-    rating_view = read("iHeartRating/iHeartRatingView.swift")
-    tests = read("iHeartRatingTests/iHeartRatingTests.swift")
-    require(rating_view.count("let maxImageWidth =") == 1,
-            "layoutSubviews must declare maxImageWidth once",
-            failures)
-    require("if maxRating < 1" in rating_view and "maxRating = 1" in rating_view,
-            "maxRating must be clamped to a supported lower bound",
-            failures)
-    require("private func boundedRating" in rating_view and
-            "return min(max(rating, Float(self.minRating)), Float(self.maxRating))" in rating_view,
-            "rating assignments must be bounded by minRating and maxRating",
-            failures)
-    require("if rating != rating" in rating_view and "return Float(self.minRating)" in rating_view,
-            "NaN ratings must fall back to minRating before rendering or bounce indexing",
-            failures)
-    require("if minRating < 0" in rating_view and "if minRating > maxRating" in rating_view,
-            "minRating must stay non-negative and not exceed maxRating",
-            failures)
-    require("self.rating = self.boundedRating(newRating)" in rating_view,
-            "touch handling must reuse bounded rating normalization",
-            failures)
-    require("if image.size.width <= 0 || image.size.height <= 0 || size.width <= 0 || size.height <= 0" in rating_view,
-            "sizeForImage must guard zero-sized images and containers",
-            failures)
-    require("if minImageSize.width < 0 || minImageSize.height < 0" in rating_view and
-            "minImageSize = CGSize" in rating_view and "setNeedsLayout()" in rating_view,
-            "minImageSize must be clamped to non-negative values and trigger layout",
-            failures)
-    require(re.search(r"@IBInspectable public var emptyImage: UIImage\? \{.*?didSet \{.*?self\.setNeedsLayout\(\).*?self\.refresh\(\)", rating_view, re.DOTALL),
-            "emptyImage changes must invalidate layout before refreshing masks",
-            failures)
-    require(re.search(r"@IBInspectable public var fullImage: UIImage\? \{.*?didSet \{.*?self\.setNeedsLayout\(\).*?self\.refresh\(\)", rating_view, re.DOTALL),
-            "fullImage changes must invalidate layout before refreshing masks",
-            failures)
-    require("let imageCount = self.emptyImageViews.count" in rating_view and "if imageCount == 0" in rating_view,
-            "layoutSubviews must guard empty image arrays",
-            failures)
-    require("imageCount > 1 ?" in rating_view,
-            "layoutSubviews must avoid dividing by imageCount - 1 for single-rating views",
-            failures)
-    require("let layoutBounds = self.bounds" in rating_view and
-            "layoutBounds.size.width / CGFloat(imageCount)" in rating_view and
-            "max(self.minImageSize.height, layoutBounds.size.height)" in rating_view and
-            "layoutBounds.origin.x" in rating_view and "layoutBounds.origin.y" in rating_view,
-            "layoutSubviews must calculate image geometry in local bounds coordinates",
-            failures)
-    require("self.frame.size.width / CGFloat(imageCount)" not in rating_view and
-            "max(self.minImageSize.height, self.frame.size.height)" not in rating_view,
-            "layoutSubviews must not size child images from transformed frame coordinates",
-            failures)
-    require("if self.emptyImageViews.isEmpty" in rating_view,
-            "touch handling must guard empty image arrays",
-            failures)
-    require("if imageView.frame.size.width <= 0" in rating_view,
-            "touch handling must guard zero-width image frames",
-            failures)
-    require("shouldBounce && !self.fullImageViews.isEmpty" in rating_view and "min(max(rawImageViewIndex, 0), self.fullImageViews.count - 1)" in rating_view,
-            "bounce handling must clamp the animated image index",
-            failures)
-    require("private func bounceImageForCurrentRating()" in rating_view and "self.bounceImageForCurrentRating()" in rating_view,
-            "bounce handling must run independently of delegate callbacks",
-            failures)
-    require(rating_view.count("if !self.editable") >= 4,
-            "touch handling must ignore began, moved, and ended touches when the view is not editable",
-            failures)
-    require("if touches.isEmpty" in rating_view,
-            "touch handlers must ignore empty touch sets before delegate and bounce work",
-            failures)
-    require(rating_view.count("if touches.isEmpty") >= 3,
-            "touchesBegan, touchesMoved, and touchesEnded must all guard empty touch sets",
-            failures)
-    require("testMaxRatingDoesNotStayBelowOne" in tests and "testZeroSizeImageReturnsZeroSize" in tests and
-            "testRatingDoesNotExceedMaxRating" in tests and "testMinRatingDoesNotExceedMaxRating" in tests and
-            "testNaNRatingFallsBackToMinRating" in tests and "Float(0.0) / Float(0.0)" in tests and
-            "testMinImageSizeDoesNotStayNegative" in tests and
-            "testLayoutUsesLocalBoundsWhenViewIsScaled" in tests and
-            "CGAffineTransformMakeScale(2, 2)" in tests and
-            "hrv.bounds.size.width == 100" in tests and
-            "testTouchesEndedDoesNotNotifyWhenNotEditable" in tests and
-            "testTouchesEndedDoesNotNotifyWithoutTouches" in tests and
-            "testTouchesBeganDoesNotNotifyWithoutTouches" in tests and
-            "testTouchesMovedDoesNotNotifyWithoutTouches" in tests,
-            "unit tests must cover rating bounds, maxRating lower bound, zero-size image handling, and touch-end guards",
-            failures)
-
-    root_podspec = read("iHeartRating.podspec")
-    archived_podspec = read("iHeartRating/0.1.6/iHeartRating.podspec")
-    for name, podspec in [("iHeartRating.podspec", root_podspec), ("iHeartRating/0.1.6/iHeartRating.podspec", archived_podspec)]:
-        require('s.name         = "iHeartRating"' in podspec, f"{name} must keep the pod name", failures)
-        require('s.version      = "0.1.6"' in podspec, f"{name} must keep version 0.1.6", failures)
-        require('s.source       = { :git => "https://github.com/garethpaul/iHeartRating.git", :tag => s.version }' in podspec,
-                f"{name} must use HTTPS git source and tag by version",
-                failures)
-        require('s.social_media_url   = "https://twitter.com/gpj"' in podspec,
-                f"{name} must use HTTPS social media URL",
-                failures)
-        require('s.source_files = "iHeartRating/*.{swift}"' in podspec,
-                f"{name} must keep the Swift source glob",
-                failures)
-
-    readme = read("README.md")
-    vision = read("VISION.md")
-    security = read("SECURITY.md")
-    changes = read("CHANGES.md")
-    makefile = read("Makefile")
-    baseline_plan = BASELINE_PLAN.read_text(encoding="utf-8") if BASELINE_PLAN.exists() else ""
-    make_gates_plan = MAKE_GATES_PLAN.read_text(encoding="utf-8") if MAKE_GATES_PLAN.exists() else ""
-    rating_bounds_plan = RATING_BOUNDS_PLAN.read_text(encoding="utf-8") if RATING_BOUNDS_PLAN.exists() else ""
-    bounce_plan = BOUNCE_PLAN.read_text(encoding="utf-8") if BOUNCE_PLAN.exists() else ""
-    noneditable_plan = NONEDITABLE_PLAN.read_text(encoding="utf-8") if NONEDITABLE_PLAN.exists() else ""
-    empty_touch_plan = EMPTY_TOUCH_PLAN.read_text(encoding="utf-8") if EMPTY_TOUCH_PLAN.exists() else ""
-    min_image_size_plan = MIN_IMAGE_SIZE_PLAN.read_text(encoding="utf-8") if MIN_IMAGE_SIZE_PLAN.exists() else ""
-    empty_touch_phase_plan = EMPTY_TOUCH_PHASE_PLAN.read_text(encoding="utf-8") if EMPTY_TOUCH_PHASE_PLAN.exists() else ""
-    noneditable_touch_phase_plan = NONEDITABLE_TOUCH_PHASE_PLAN.read_text(encoding="utf-8") if NONEDITABLE_TOUCH_PHASE_PLAN.exists() else ""
-    image_layout_plan = IMAGE_LAYOUT_PLAN.read_text(encoding="utf-8") if IMAGE_LAYOUT_PLAN.exists() else ""
-    hosted_validation_plan = HOSTED_VALIDATION_PLAN.read_text(encoding="utf-8") if HOSTED_VALIDATION_PLAN.exists() else ""
-    nan_rating_plan = NAN_RATING_PLAN.read_text(encoding="utf-8") if NAN_RATING_PLAN.exists() else ""
-    bounds_layout_plan = BOUNDS_LAYOUT_PLAN.read_text(encoding="utf-8") if BOUNDS_LAYOUT_PLAN.exists() else ""
-    workflow = read(".github/workflows/check.yml")
-    require(".PHONY: build check lint test" in makefile and "lint test build: check" in makefile,
-            "Makefile must expose lint, test, and build aliases for the local baseline",
-            failures)
-    require("make lint" in readme and "make test" in readme and "make build" in readme and "make check" in readme and "build.sh" in readme and "podspec" in readme and "delegate-independent bounce" in readme and "non-editable" in readme and "empty touch" in readme.lower() and "minImageSize" in readme and "image layout invalidation" in readme and "local bounds" in readme.lower(),
-            "README must document static verification, build script, and podspec expectations",
-            failures)
-    require("empty began/moved touch" in readme,
-            "README must document empty began/moved touch guards",
-            failures)
-    require("non-editable began/moved touch" in readme,
-            "README must document non-editable began/moved touch guards",
-            failures)
-    require("scripts/check-baseline.py" in vision and "make lint" in vision and "make test" in vision and "make build" in vision and "rating" in vision.lower() and "bounce" in vision.lower() and "non-editable" in vision.lower() and "empty touch" in vision.lower() and "empty began/moved touch" in vision.lower() and "minImageSize" in vision and "image layout invalidation" in vision and "local bounds" in vision.lower(),
-            "VISION must describe baseline validation for rating behavior",
-            failures)
-    require("non-editable began/moved touch" in vision,
-            "VISION must describe non-editable began/moved touch guards",
-            failures)
-    require("malformed configuration" in security and "make check" in security and "non-editable" in security and "empty touch" in security.lower() and "minImageSize" in security and "image layout invalidation" in security and "local bounds" in security.lower(),
-            "SECURITY must document configuration hardening and verification",
-            failures)
-    require("zero-size" in changes and "maxRating" in changes and "podspec" in changes and "rating bounds" in changes and "bounce" in changes and "not editable" in changes and "empty touch" in changes.lower() and "minImageSize" in changes and "image layout invalidation" in changes and "local bounds" in changes.lower() and "make lint" in changes and "make test" in changes and "make build" in changes,
-            "CHANGES must record rating edge-case, rating bounds, and podspec updates",
-            failures)
-    require("empty began/moved touch" in changes,
-            "CHANGES must record empty began/moved touch guards",
-            failures)
-    require("non-editable began/moved touch" in changes,
-            "CHANGES must record non-editable began/moved touch guards",
-            failures)
-    require("status: completed" in baseline_plan and "status: completed" in rating_bounds_plan and "status: completed" in bounce_plan,
-            "plans must be marked completed",
-            failures)
-    require("status: completed" in make_gates_plan,
-            "make gate aliases plan must be marked completed",
-            failures)
-    require("status: completed" in noneditable_plan,
-            "non-editable touch-end plan must be marked completed",
-            failures)
-    require("status: completed" in empty_touch_plan,
-            "empty touch-end plan must be marked completed",
-            failures)
-    require("status: completed" in min_image_size_plan,
-            "min image size plan must be marked completed",
-            failures)
-    require("status: completed" in empty_touch_phase_plan,
-            "empty touch phase plan must be marked completed",
-            failures)
-    require("status: completed" in noneditable_touch_phase_plan,
-            "non-editable touch phase plan must be marked completed",
-            failures)
-    require("status: completed" in image_layout_plan,
-            "rating image layout invalidation plan must be marked completed",
-            failures)
-    require("status: completed" in hosted_validation_plan and "make check" in hosted_validation_plan,
-            "hosted project validation plan must be completed and document make check",
-            failures)
-    require("status: completed" in nan_rating_plan and "make check" in nan_rating_plan,
-            "NaN rating boundary plan must be completed and document verification",
-            failures)
-    require("status: completed" in bounds_layout_plan and "frame-based" in bounds_layout_plan,
-            "bounds-based image layout plan must record completed mutation verification",
-            failures)
-    require(workflow.count("permissions:\n  contents: read") == 1 and
-            not re.search(r"(?m)^\s{2,}permissions:\s*$", workflow) and
-            not re.search(r"(?m)^\s+[A-Za-z0-9_-]+:\s*write\s*$", workflow),
-            "Check workflow must use one top-level read-only permissions block",
-            failures)
-    require("cancel-in-progress: true" in workflow and "runs-on: macos-15" in workflow and
-            "timeout-minutes: 10" in workflow,
-            "Check workflow must bound duplicate and long-running macOS jobs",
-            failures)
-    require(workflow.count("uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10") == 1 and
-            "persist-credentials: false" in workflow and
-            "run: make check" in workflow,
-            "Check workflow must pin one credential-free checkout and run the canonical baseline",
-            failures)
+    run(["ruby", "-c", str(ROOT / "iHeartRating.podspec")], "root podspec syntax check failed", failures)
+    run(["sh", "-n", str(ROOT / "build.sh")], "build script syntax check failed", failures)
+    try:
+        ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    except SyntaxError as error:
+        failures.append(f"baseline checker syntax check failed: {error}")
 
     if shutil.which("xcodebuild"):
-        run(["xcodebuild", "-list", "-project", "iHeartRating.xcodeproj"],
-            failures, "xcodebuild must parse iHeartRating.xcodeproj")
-        run(["xcodebuild", "-list", "-project", "example/SampleApp/SampleApp.xcodeproj"],
-            failures, "xcodebuild must parse the SampleApp project")
+        run(
+            ["xcodebuild", "-list", "-project", str(ROOT / "iHeartRating.xcodeproj")],
+            "xcodebuild could not parse iHeartRating.xcodeproj",
+            failures,
+        )
+        run(
+            ["xcodebuild", "-list", "-project", str(ROOT / "example/SampleApp/SampleApp.xcodeproj")],
+            "xcodebuild could not parse SampleApp.xcodeproj",
+            failures,
+        )
     else:
-        print("xcodebuild unavailable; static iOS baseline only.")
+        print("xcodebuild unavailable; executable iOS validation requires make xcode-test on macOS.")
 
     if failures:
-        for failure in failures:
-            print(failure, file=sys.stderr)
+        print("\n".join(failures), file=sys.stderr)
         return 1
 
     print("iHeartRating baseline checks passed.")

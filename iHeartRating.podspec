@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "iHeartRating"
-  s.version      = "0.1.6"
+  s.version      = "0.2.0"
   s.summary      = "iHeartRating provides rating functionality for hearts or any image extends UIView"
 
   # This description is used to generate tags and improve search results.
@@ -64,7 +64,8 @@ Pod::Spec.new do |s|
   #  the deployment target. You can optionally include the target after the platform.
   #
 
-  s.platform     = :ios, "8.0"
+  s.platform     = :ios, "12.0"
+  s.swift_version = "5.0"
 
   #  When using multiple platforms
   # s.ios.deployment_target = "5.0"

@@ -1,153 +1,249 @@
-//
-//  iHeartRatingTests.swift
-//  iHeartRatingTests
-//
-//  Created by Gareth on 7/1/16.
-//  Copyright © 2016 GPJ. All rights reserved.
-//
-
 import XCTest
 import UIKit
 
 @testable import iHeartRating
 
-class RecordingHeartRatingDelegate: NSObject, HeartRatingViewDelegate {
-    var didUpdateCount = 0
-    var isUpdatingCount = 0
+final class RecordingHeartRatingDelegate: NSObject, HeartRatingViewDelegate {
+    var didUpdateRatings: [Float] = []
+    var updatingRatings: [Float] = []
 
-    func heartRatingView(ratingView: HeartRatingView, didUpdate rating: Float) {
-        didUpdateCount += 1
+    func heartRatingView(_ ratingView: HeartRatingView, didUpdate rating: Float) {
+        didUpdateRatings.append(rating)
     }
 
-    func heartRatingView(ratingView: HeartRatingView, isUpdating rating: Float) {
-        isUpdatingCount += 1
+    func heartRatingView(_ ratingView: HeartRatingView, isUpdating rating: Float) {
+        updatingRatings.append(rating)
     }
 }
 
-class iHeartRatingTests: XCTestCase {
-    
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-    
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 1000, height: 1000))
-        XCTAssert(hrv.frame.height == 1000)
-        
+final class iHeartRatingTests: XCTestCase {
+    private func image(width: CGFloat = 20, height: CGFloat = 10) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: width, height: height))
+        return renderer.image { context in
+            UIColor.black.setFill()
+            context.fill(CGRect(x: 0, y: 0, width: width, height: height))
+        }
     }
 
-    func testMaxRatingDoesNotStayBelowOne() {
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-        hrv.maxRating = 0
-        XCTAssert(hrv.maxRating == 1)
+    private func configuredView(frame: CGRect = CGRect(x: 0, y: 0, width: 100, height: 20)) -> HeartRatingView {
+        let view = HeartRatingView(frame: frame)
+        let ratingImage = image()
+        view.emptyImage = ratingImage
+        view.fullImage = ratingImage
+        return view
     }
 
-    func testRatingDoesNotExceedMaxRating() {
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-        hrv.maxRating = 3
-        hrv.rating = 9
-        XCTAssert(hrv.rating == 3)
+    private func assertFinite(_ rect: CGRect, file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertTrue(rect.origin.x.isFinite, file: file, line: line)
+        XCTAssertTrue(rect.origin.y.isFinite, file: file, line: line)
+        XCTAssertTrue(rect.size.width.isFinite, file: file, line: line)
+        XCTAssertTrue(rect.size.height.isFinite, file: file, line: line)
+        XCTAssertGreaterThanOrEqual(rect.size.width, 0, file: file, line: line)
+        XCTAssertGreaterThanOrEqual(rect.size.height, 0, file: file, line: line)
     }
 
-    func testNaNRatingFallsBackToMinRating() {
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-        hrv.minRating = 2
-        hrv.rating = Float(0.0) / Float(0.0)
-        XCTAssert(hrv.rating == 2)
+    func testRatingAndBoundsNormalizeInvalidValues() {
+        let view = HeartRatingView(frame: .zero)
+        view.maxRating = 0
+        XCTAssertEqual(view.maxRating, 1)
+
+        view.maxRating = 3
+        view.minRating = 5
+        XCTAssertEqual(view.minRating, 3)
+        XCTAssertEqual(view.rating, 3)
+
+        view.minRating = 2
+        view.rating = .nan
+        XCTAssertEqual(view.rating, 2)
+        view.rating = .infinity
+        XCTAssertEqual(view.rating, 3)
+        view.rating = -.infinity
+        XCTAssertEqual(view.rating, 2)
     }
 
-    func testMinRatingDoesNotExceedMaxRating() {
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-        hrv.maxRating = 2
-        hrv.minRating = 5
-        XCTAssert(hrv.minRating == 2)
-        XCTAssert(hrv.rating == 2)
+    func testMaximumRatingCountIsBoundedBeforeAllocatingImageViews() {
+        let view = HeartRatingView(frame: .zero)
+
+        view.maxRating = 101
+
+        XCTAssertEqual(view.maxRating, 100)
+        XCTAssertEqual(view.subviews.count, 200)
     }
 
-    func testZeroSizeImageReturnsZeroSize() {
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-        let imageSize = hrv.sizeForImage(UIImage(), inSize: CGSizeZero)
-        XCTAssert(imageSize.width == 0)
-        XCTAssert(imageSize.height == 0)
+    func testMinimumImageSizeNormalizesEachInvalidDimension() {
+        let view = HeartRatingView(frame: .zero)
+        let invalidValues: [CGFloat] = [-1, .nan, .infinity, -.infinity]
+
+        for invalidValue in invalidValues {
+            view.minImageSize = CGSize(width: invalidValue, height: 12)
+            XCTAssertEqual(view.minImageSize.width, 0)
+            XCTAssertEqual(view.minImageSize.height, 12)
+
+            view.minImageSize = CGSize(width: 15, height: invalidValue)
+            XCTAssertEqual(view.minImageSize.width, 15)
+            XCTAssertEqual(view.minImageSize.height, 0)
+        }
     }
 
-    func testMinImageSizeDoesNotStayNegative() {
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-        hrv.minImageSize = CGSize(width: -10, height: -5)
-        XCTAssert(hrv.minImageSize.width == 0)
-        XCTAssert(hrv.minImageSize.height == 0)
+    func testSizeForImageRejectsNonFiniteAndNonPositiveContainers() {
+        let view = HeartRatingView(frame: .zero)
+        let ratingImage = image()
+        let hostileSizes = [
+            CGSize(width: CGFloat.nan, height: 10),
+            CGSize(width: 10, height: CGFloat.infinity),
+            CGSize(width: -CGFloat.infinity, height: 10),
+            CGSize(width: -1, height: 10),
+            .zero
+        ]
+
+        for hostileSize in hostileSizes {
+            XCTAssertEqual(view.sizeForImage(ratingImage, inSize: hostileSize), .zero)
+        }
+    }
+
+    func testExtremeMinimumImageSizeStillProducesFiniteBoundedFrames() {
+        let view = configuredView()
+        view.minImageSize = CGSize(
+            width: CGFloat.greatestFiniteMagnitude,
+            height: CGFloat.greatestFiniteMagnitude
+        )
+
+        view.layoutIfNeeded()
+
+        XCTAssertEqual(view.subviews.count, 10)
+        for subview in view.subviews {
+            assertFinite(subview.frame)
+            XCTAssertLessThanOrEqual(subview.frame.width, view.bounds.width)
+            XCTAssertLessThanOrEqual(subview.frame.height, view.bounds.height)
+        }
+    }
+
+    func testRepeatedLayoutKeepsPartialMaskFiniteAndStable() {
+        let view = configuredView()
+        view.rating = 0.5
+
+        view.layoutIfNeeded()
+        let fullImageView = view.subviews[1] as! UIImageView
+        let firstMaskFrame = try! XCTUnwrap(fullImageView.layer.mask?.frame)
+        assertFinite(firstMaskFrame)
+
+        view.setNeedsLayout()
+        view.layoutIfNeeded()
+        let secondMaskFrame = try! XCTUnwrap(fullImageView.layer.mask?.frame)
+
+        XCTAssertEqual(secondMaskFrame, firstMaskFrame)
+        assertFinite(secondMaskFrame)
     }
 
     func testLayoutUsesLocalBoundsWhenViewIsScaled() {
-        UIGraphicsBeginImageContextWithOptions(CGSize(width: 20, height: 20), false, 1)
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
+        let view = configuredView()
+        view.transform = CGAffineTransform(scaleX: 2, y: 2)
 
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-        hrv.emptyImage = image
-        hrv.transform = CGAffineTransformMakeScale(2, 2)
-        hrv.layoutSubviews()
+        view.layoutIfNeeded()
 
-        let firstImageView = hrv.subviews.first as! UIImageView
-        XCTAssert(hrv.frame.size.width == 200)
-        XCTAssert(hrv.bounds.size.width == 100)
-        XCTAssert(abs(firstImageView.frame.size.width - 20) < 0.001)
+        let firstImageView = view.subviews.first as! UIImageView
+        XCTAssertEqual(view.frame.width, 200, accuracy: 0.001)
+        XCTAssertEqual(view.bounds.width, 100, accuracy: 0.001)
+        XCTAssertEqual(firstImageView.frame.width, 20, accuracy: 0.001)
     }
 
-    func testTouchesEndedDoesNotNotifyWhenNotEditable() {
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-        let delegate = RecordingHeartRatingDelegate()
-        hrv.delegate = delegate
-        hrv.editable = false
+    func testIntrinsicContentSizeTracksImagesCountAndMinimumSize() {
+        let view = HeartRatingView(frame: .zero)
+        view.emptyImage = image(width: 20, height: 10)
+        view.fullImage = image(width: 24, height: 12)
+        view.maxRating = 4
+        view.minImageSize = CGSize(width: 30, height: 16)
 
-        hrv.touchesEnded(Set<UITouch>(), withEvent: nil)
+        XCTAssertEqual(view.intrinsicContentSize.width, 120, accuracy: 0.001)
+        XCTAssertEqual(view.intrinsicContentSize.height, 16, accuracy: 0.001)
 
-        XCTAssert(delegate.didUpdateCount == 0)
+        let container = UIView(frame: .zero)
+        view.translatesAutoresizingMaskIntoConstraints = false
+        container.addSubview(view)
+        NSLayoutConstraint.activate([
+            view.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+            view.topAnchor.constraint(equalTo: container.topAnchor),
+            view.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+            view.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+        ])
+        XCTAssertEqual(
+            container.systemLayoutSizeFitting(UIView.layoutFittingCompressedSize),
+            view.intrinsicContentSize
+        )
     }
 
-    func testTouchesEndedDoesNotNotifyWithoutTouches() {
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-        let delegate = RecordingHeartRatingDelegate()
-        hrv.delegate = delegate
+    func testIncompleteImagePairHasNoIntrinsicSizeAndHidesOverlays() {
+        let view = configuredView()
+        view.rating = 0.5
+        view.layoutIfNeeded()
+        let fullImageView = view.subviews[1] as! UIImageView
+        XCTAssertFalse(fullImageView.isHidden)
+        XCTAssertNotNil(fullImageView.layer.mask)
 
-        hrv.touchesEnded(Set<UITouch>(), withEvent: nil)
+        view.emptyImage = nil
 
-        XCTAssert(delegate.didUpdateCount == 0)
+        XCTAssertEqual(view.intrinsicContentSize, .zero)
+        XCTAssertTrue(fullImageView.isHidden)
+        XCTAssertNil(fullImageView.layer.mask)
     }
 
-    func testTouchesBeganDoesNotNotifyWithoutTouches() {
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-        let delegate = RecordingHeartRatingDelegate()
-        hrv.delegate = delegate
+    func testImageContentModePropagatesAndSurvivesImageViewReplacement() {
+        let view = HeartRatingView(frame: .zero)
+        view.imageContentMode = .scaleAspectFill
+        view.maxRating = 3
 
-        hrv.touchesBegan(Set<UITouch>(), withEvent: nil)
-
-        XCTAssert(delegate.isUpdatingCount == 0)
-    }
-
-    func testTouchesMovedDoesNotNotifyWithoutTouches() {
-        let hrv = HeartRatingView.init(frame: CGRect(x: 0, y: 0, width: 100, height: 20))
-        let delegate = RecordingHeartRatingDelegate()
-        hrv.delegate = delegate
-
-        hrv.touchesMoved(Set<UITouch>(), withEvent: nil)
-
-        XCTAssert(delegate.isUpdatingCount == 0)
-    }
-    
-    func testPerformanceExample() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            // Put the code you want to measure the time of here.
+        XCTAssertEqual(view.subviews.count, 6)
+        for subview in view.subviews {
+            XCTAssertEqual((subview as! UIImageView).contentMode, .scaleAspectFill)
         }
+
+        XCTAssertTrue(view.responds(to: NSSelectorFromString("setImageContentMode:")))
     }
-    
+
+    func testAccessibilityStateTracksRatingAndEditability() {
+        let view = configuredView()
+        view.maxRating = 5
+        view.rating = 2.5
+
+        XCTAssertTrue(view.isAccessibilityElement)
+        XCTAssertEqual(view.accessibilityLabel, "Rating")
+        XCTAssertEqual(view.accessibilityValue, "2.5 of 5")
+        XCTAssertTrue(view.accessibilityTraits.contains(.adjustable))
+
+        view.editable = false
+
+        XCTAssertFalse(view.accessibilityTraits.contains(.adjustable))
+        XCTAssertTrue(view.accessibilityTraits.contains(.staticText))
+    }
+
+    func testAccessibilityAdjustmentsAreBoundedAndNotifyDelegate() {
+        let view = configuredView()
+        let delegate = RecordingHeartRatingDelegate()
+        view.delegate = delegate
+        view.maxRating = 2
+        view.rating = 1
+
+        view.accessibilityIncrement()
+        view.accessibilityIncrement()
+        view.accessibilityDecrement()
+
+        XCTAssertEqual(view.rating, 1)
+        XCTAssertEqual(delegate.didUpdateRatings, [2, 2, 1])
+        XCTAssertEqual(view.accessibilityValue, "1 of 2")
+    }
+
+    func testEmptyAndNoneditableTouchesDoNotNotify() {
+        let view = HeartRatingView(frame: .zero)
+        let delegate = RecordingHeartRatingDelegate()
+        view.delegate = delegate
+
+        view.touchesBegan([], with: nil)
+        view.touchesMoved([], with: nil)
+        view.touchesEnded([], with: nil)
+        view.editable = false
+        view.touchesEnded([], with: nil)
+
+        XCTAssertTrue(delegate.updatingRatings.isEmpty)
+        XCTAssertTrue(delegate.didUpdateRatings.isEmpty)
+    }
 }

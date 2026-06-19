@@ -36,7 +36,8 @@ Additional scan context:
 ### Prerequisites
 
 - Git
-- macOS with Xcode for building Apple platform projects
+- macOS with a current Xcode release for building Apple platform projects
+- iOS 12 or newer for consumers
 - Python 3 for local static verification on non-macOS hosts
 
 ### Setup
@@ -48,9 +49,13 @@ make lint
 make test
 make build
 make check
+make xcode-test
 ```
 
-The setup commands above validate the static baseline. Full simulator builds still require macOS with Xcode.
+The first four commands validate the location-independent static baseline.
+`make xcode-test` selects an available iPhone simulator, runs the library XCTest
+suite, checks the generated Objective-C compatibility header, and builds the
+sample application.
 
 ## Running or Using the Project
 
@@ -69,9 +74,9 @@ make build
 make check
 ```
 
-The `lint`, `test`, and `build` targets intentionally alias the static baseline
-on hosts without the legacy Xcode toolchain, so the standard local gate commands
-stay available while preserving the single source of truth.
+The `lint`, `test`, and `build` targets intentionally alias the static baseline.
+Use `make xcode-test` for executable Swift, UIKit, Objective-C interoperability,
+and sample-project evidence.
 
 The baseline parses plist/storyboard/SVG files, validates both podspecs, checks `build.sh` shell syntax, verifies rating-view guards for empty, single-item, zero-size, negative `minImageSize`, invalid `maxRating`, rating bounds, non-editable touch endings, empty touch endings, empty began/moved touch events, out-of-range bounce configurations, and delegate-independent bounce behavior, and reports when Xcode is unavailable.
 It also keeps non-editable began/moved touch events from sending live-update
@@ -80,17 +85,33 @@ It also keeps image layout invalidation in the rating image setters so runtime
 image changes recalculate frames before masks refresh.
 Rating image geometry is calculated from the view's local bounds so transforms
 do not inflate or misalign child images.
+An incomplete image pair renders no full overlays: clearing either image hides
+filled ratings and removes stale masks until both images are configured again.
 NaN programmatic ratings fall back to `minRating` before mask rendering or
 bounce animation indexing.
+NaN `minImageSize` dimensions normalize independently to zero while valid
+companion dimensions are preserved.
+Infinite `minImageSize` dimensions normalize independently to zero while valid
+companion dimensions are preserved.
+`imageContentMode` changes propagate to every existing image view so already
+created empty and full image pairs stay synchronized with the configured mode.
+External consumers can configure the public `imageContentMode` property while its existing observer keeps every rating image synchronized.
+Complete image pairs provide an intrinsic content size derived from the larger
+configured image, `minImageSize`, and `maxRating`; incomplete pairs have zero
+intrinsic size and clear stale filled-image masks.
+Hostile NaN, infinite, negative, zero, and extreme finite geometry is normalized
+or bounded before frames and masks reach Core Animation.
+`maxRating` is capped at 100 before child image views are allocated, preventing
+unbounded memory growth from malformed configuration.
+The control is one adjustable accessibility element with a default `Rating`
+label, a synchronized `<value> of <max>` value, and bounded increment/decrement
+actions. Consumers may replace the accessibility label for localization.
+As with UIKit generally, create and mutate `HeartRatingView` on the main thread.
 
-The pinned, credential-free GitHub Actions check runs `make check` on
-`macos-15`. When Xcode is available, the baseline parses both
-`iHeartRating.xcodeproj` and the SampleApp project with `xcodebuild -list`.
-This verifies project-file integrity but does not claim that Swift 2 sources
-compile on a current Xcode toolchain.
-
-For full legacy verification, use Xcode 7.3 with its matching simulator runtime
-and run Xcode's test action, `xcodebuild test`, or `./build.sh`.
+The pinned, credential-free GitHub Actions check runs both `make check` and
+`make xcode-test` on `macos-15`. The projects pin Swift 5 and iOS 12, the hosted
+gate executes XCTest on a simulator, inspects the generated Swift-to-Objective-C
+header, and compiles the SampleApp without signing.
 
 When the required SDK or runtime is unavailable, use static checks and source review first, then verify on a machine that has the matching platform toolchain.
 
@@ -108,9 +129,13 @@ When the required SDK or runtime is unavailable, use static checks and source re
   refresh work runs.
 - Rating image layout should use local bounds rather than transformed frame
   dimensions.
+- An incomplete image pair should hide full overlays and clear stale masks
+  until both rating images are configured.
 
 ## Maintenance Notes
 
+- Every Make verification target derives the checkout root from the loaded
+  Makefile, so an absolute Makefile path works from any working directory.
 - This looks like an Apple platform project or sample. Xcode, Swift, CocoaPods, and deployment target versions may need to match the original project era.
 - See `SECURITY.md` for vulnerability reporting and safe research guidance.
 - See `VISION.md` for project direction and contribution guardrails.
@@ -128,6 +153,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   normalization.
 - See `docs/plans/2026-06-12-bounds-based-image-layout.md` for transformed-view
   layout correctness.
+- See `docs/plans/2026-06-13-incomplete-image-pair.md` for fail-closed image-pair
+  rendering.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, podspecs, plist/storyboard files, or build scripts.
 

@@ -1,6 +1,11 @@
-.PHONY: build check lint test
+.PHONY: build check lint test xcode-test
+
+ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))
 
 lint test build: check
 
+xcode-test:
+	@"$(ROOT)/build.sh"
+
 check:
-	python3 scripts/check-baseline.py
+	@python3 "$(ROOT)/scripts/check-baseline.py"

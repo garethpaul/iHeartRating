@@ -34,27 +34,14 @@ Look at code in ViewController.swift
       import UIKit
         import iHeartRating
 
-        class ViewController: UIViewController, HeartRatingViewDelegate {
-
-           override func viewDidLoad() {
-                super.viewDidLoad()
-                // Do any additional setup after loading the view, typically from a nib.
-            }
-
-            override func didReceiveMemoryWarning() {
-                super.didReceiveMemoryWarning()
-                // Dispose of any resources that can be recreated.
-            }
-
-            func heartRatingView(ratingView: HeartRatingView, isUpdating rating:Float) {
+        final class ViewController: UIViewController, HeartRatingViewDelegate {
+            func heartRatingView(_ ratingView: HeartRatingView, isUpdating rating: Float) {
                 // do something while (rating) has been initiated
             }
 
-            func heartRatingView(ratingView: HeartRatingView, didUpdate rating: Float) {
+            func heartRatingView(_ ratingView: HeartRatingView, didUpdate rating: Float) {
                 // do something when (rating) object has been updates
             }
-
-
         }
 
 Step 4.
