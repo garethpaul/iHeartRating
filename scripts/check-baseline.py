@@ -131,7 +131,7 @@ def main() -> int:
     require('s.platform     = :ios, "12.0"' in podspec, "podspec must match the tested iOS deployment target", failures)
     require('s.swift_version = "5.0"' in podspec, "podspec must declare its Swift language version", failures)
 
-    require("ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile, "Make targets must be location independent", failures)
+    require("override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile, "Make targets must be location independent", failures)
     require(
         re.search(r"(?m)^xcode-test:\s*$", makefile) is not None
         and '"$(ROOT)/build.sh"' in makefile,
