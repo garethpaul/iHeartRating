@@ -74,6 +74,12 @@ def main() -> int:
         failures,
     )
     require(
+        "let maximumImageWidth = desiredImageWidth" in source
+        and "testOversizedMinimumImageWidthDoesNotOverlapRatingFrames" in tests,
+        "constrained rating image frames must not overlap when minimum width exceeds a slot",
+        failures,
+    )
+    require(
         "guard emptyImage != nil, fullImage != nil" in source
         and "layer.mask = nil" in source
         and "isHidden = true" in source,

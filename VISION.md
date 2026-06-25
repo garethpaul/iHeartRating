@@ -26,6 +26,7 @@ Priority:
   syntax
 - Keep image layout invalidation tied to runtime rating image changes
 - Keep child image geometry in the rating view's local bounds coordinate space
+- Keep constrained rating image frames ordered and non-overlapping
 - Hide full overlays whenever an incomplete image pair is configured
 - Normalize NaN rating assignments before rendering and animation indexing
 - Normalize NaN `minImageSize` dimensions before image layout

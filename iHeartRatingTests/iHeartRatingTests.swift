@@ -118,6 +118,20 @@ final class iHeartRatingTests: XCTestCase {
         }
     }
 
+    func testOversizedMinimumImageWidthDoesNotOverlapRatingFrames() {
+        let view = configuredView()
+        view.minImageSize = CGSize(width: view.bounds.width, height: 0)
+
+        view.layoutIfNeeded()
+
+        let emptyFrames = stride(from: 0, to: view.subviews.count, by: 2).map {
+            view.subviews[$0].frame
+        }
+        for index in 1..<emptyFrames.count {
+            XCTAssertGreaterThanOrEqual(emptyFrames[index].minX, emptyFrames[index - 1].maxX)
+        }
+    }
+
     func testRepeatedLayoutKeepsPartialMaskFiniteAndStable() {
         let view = configuredView()
         view.rating = 0.5

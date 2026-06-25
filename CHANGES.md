@@ -1,5 +1,24 @@
 # Changes
 
+## 2026-06-25T20:57:46Z — P2 correctness — cycle: constrained image spacing
+
+- Threads: inspected the default branch, open work, rating bounds, hostile
+  geometry normalization, intrinsic sizing, transformed layout, touch and
+  accessibility paths, Xcode tests, static contracts, and hosted workflow; no
+  open pull requests or issues were present.
+- Bug fixed: constrained layout now caps each rating image to its available
+  slot width, preventing oversized `minImageSize` values from producing
+  negative spacing and overlapping interactive image frames.
+- Files: `iHeartRatingView.swift`, `iHeartRatingTests.swift`,
+  `scripts/check-baseline.py`, and
+  `docs/plans/2026-06-25-constrained-rating-image-spacing.md`.
+- Validation: reproduced the missing slot-cap contract, passed the static
+  baseline, Python and shell syntax checks, and both CocoaPods spec checks.
+- Blockers: Xcode and an iOS simulator are unavailable locally; hosted macOS
+  executable tests and Objective-C header validation remain required.
+- Next: visually verify extreme intrinsic minimums in compressed stack and
+  Auto Layout containers across left-to-right and right-to-left interfaces.
+
 ## 2026-06-19
 
 - Migrated the library, tests, and SampleApp from unbuildable Swift 2 project
