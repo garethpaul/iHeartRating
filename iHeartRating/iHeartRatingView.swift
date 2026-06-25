@@ -166,7 +166,7 @@ open class HeartRatingView: UIView {
         }
 
         let desiredImageWidth = layoutWidth / CGFloat(imageCount)
-        let maximumImageWidth = min(max(minImageSize.width, desiredImageWidth), layoutWidth)
+        let maximumImageWidth = desiredImageWidth
         let maximumImageHeight = min(max(minImageSize.height, layoutHeight), layoutHeight)
         let imageViewSize = sizeForImage(
             emptyImage,
