@@ -1,5 +1,16 @@
 # Changes
 
+## 2026-06-26T12:03:17Z — P3 documentation — package support boundary
+
+- Clarified that CocoaPods and direct Xcode integration are the currently
+  declared and verified distribution surfaces.
+- Documented that Swift Package Manager is not supported without a
+  `Package.swift`, resource rules, and hosted SwiftPM build evidence.
+- Retired the completed package-support clarification priority and added a
+  fail-closed baseline contract plus completed implementation plan.
+- Validation passed the static/Make gates, both podspec syntax checks, four
+  hostile documentation/manifest mutations, and `git diff --check`.
+
 ## 2026-06-25 — P2 correctness — accessibility boundary no-ops
 
 - Made accessibility increment and decrement actions true no-ops at the rating

@@ -40,6 +40,31 @@ def main() -> int:
     build_script = read("build.sh")
     workflow = read(".github/workflows/check.yml")
     podspec = read("iHeartRating.podspec")
+    readme = read("README.md")
+    vision = read("VISION.md")
+    package_plan = read("docs/plans/2026-06-26-swift-package-support.md")
+
+    require(not (ROOT / "Package.swift").exists(), "unverified Package.swift must not appear without focused SwiftPM support", failures)
+    require(
+        "Swift Package Manager is not currently supported" in readme
+        and "CocoaPods and direct Xcode project integration" in readme
+        and "hosted SwiftPM build" in readme,
+        "README must document the current CocoaPods/Xcode-only package boundary",
+        failures,
+    )
+    require(
+        "Keep CocoaPods and direct Xcode integration as the only declared package" in vision
+        and "Clarify Swift Package Manager support if the library is revived" not in vision,
+        "VISION must preserve the package boundary and retire the completed clarification",
+        failures,
+    )
+    require(
+        re.search(r"(?mi)^status:\s*completed\s*$", package_plan) is not None
+        and "Verification Completed" in package_plan
+        and "Four focused hostile mutations" in package_plan,
+        "Swift package support plan must record completed verification",
+        failures,
+    )
 
     require(
         "@objcMembers" in source and "open class HeartRatingView: UIView" in source,

@@ -63,6 +63,15 @@ sample application.
 - Run `./build.sh` when Xcode and the required simulator runtime are installed.
 - Use `example/SampleApp` for storyboard/sample-app behavior and `iHeartRating.podspec` for CocoaPods metadata review.
 
+### Package Support
+
+- CocoaPods and direct Xcode project integration are the currently declared and
+  verified distribution surfaces.
+- Swift Package Manager is not currently supported: this repository has no
+  `Package.swift`, resource declaration, or hosted SwiftPM build.
+- Adding SwiftPM support requires a focused change that defines the package
+  products/targets, handles image resources, and adds executable hosted tests.
+
 ## Testing and Verification
 
 Run the local static baseline:
@@ -159,6 +168,8 @@ When the required SDK or runtime is unavailable, use static checks and source re
   layout correctness.
 - See `docs/plans/2026-06-13-incomplete-image-pair.md` for fail-closed image-pair
   rendering.
+- See `docs/plans/2026-06-26-swift-package-support.md` for the current
+  CocoaPods/Xcode-only package boundary.
 - See `docs/plans/2026-06-09-make-gate-aliases.md` for the local gate alias guardrail.
 - Run `make lint`, `make test`, `make build`, and `make check` before pushing changes to Swift sources, podspecs, plist/storyboard files, or build scripts.
 
