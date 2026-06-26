@@ -1,5 +1,11 @@
 # Changes
 
+## 2026-06-25 — P2 correctness — accessibility boundary no-ops
+
+- Made accessibility increment and decrement actions true no-ops at the rating
+  boundaries so they do not send duplicate completed-update callbacks or start
+  bounce feedback when the value cannot change.
+
 ## 2026-06-25T20:57:46Z — P2 correctness — cycle: constrained image spacing
 
 - Threads: inspected the default branch, open work, rating bounds, hostile

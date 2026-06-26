@@ -230,7 +230,7 @@ final class iHeartRatingTests: XCTestCase {
         XCTAssertTrue(view.accessibilityTraits.contains(.staticText))
     }
 
-    func testAccessibilityAdjustmentsAreBoundedAndNotifyDelegate() {
+    func testAccessibilityAdjustmentsNotifyOnlyWhenRatingChanges() {
         let view = configuredView()
         let delegate = RecordingHeartRatingDelegate()
         view.delegate = delegate
@@ -240,10 +240,12 @@ final class iHeartRatingTests: XCTestCase {
         view.accessibilityIncrement()
         view.accessibilityIncrement()
         view.accessibilityDecrement()
+        view.accessibilityDecrement()
+        view.accessibilityDecrement()
 
-        XCTAssertEqual(view.rating, 1)
-        XCTAssertEqual(delegate.didUpdateRatings, [2, 2, 1])
-        XCTAssertEqual(view.accessibilityValue, "1 of 2")
+        XCTAssertEqual(view.rating, 0)
+        XCTAssertEqual(delegate.didUpdateRatings, [2, 1, 0])
+        XCTAssertEqual(view.accessibilityValue, "0 of 2")
     }
 
     func testEmptyAndNoneditableTouchesDoNotNotify() {
