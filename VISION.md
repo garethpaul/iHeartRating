@@ -37,12 +37,13 @@ Priority:
   local verification gates
 - Keep pinned, credential-free macOS CI running static contracts, simulator
   XCTest, Objective-C header checks, and the SampleApp build
+- Keep CocoaPods and direct Xcode integration as the only declared package
+  surfaces until a tested `Package.swift` is added in a focused change
 
 Next priorities:
 
 - Add visual regression coverage for image spacing and content modes
 - Add spoken VoiceOver and Switch Control device verification
-- Clarify Swift Package Manager support if the library is revived
 
 Contribution rules:
 
