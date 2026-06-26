@@ -89,6 +89,9 @@ def main() -> int:
     require(
         "public override func accessibilityIncrement()" in source
         and "public override func accessibilityDecrement()" in source
+        and "let adjustedRating = boundedRating(rating + delta)" in source
+        and "guard adjustedRating != rating else" in source
+        and "rating = adjustedRating" in source
         and "accessibilityTraits = editable ? [.adjustable] : [.staticText]" in source
         and 'accessibilityLabel = "Rating"' in source
         and "if accessibilityLabel == nil" in source,
@@ -113,7 +116,7 @@ def main() -> int:
         "testIncompleteImagePairHasNoIntrinsicSizeAndHidesOverlays",
         "testImageContentModePropagatesAndSurvivesImageViewReplacement",
         "testAccessibilityStateTracksRatingAndEditability",
-        "testAccessibilityAdjustmentsAreBoundedAndNotifyDelegate",
+        "testAccessibilityAdjustmentsNotifyOnlyWhenRatingChanges",
     ]
     for test_name in required_tests:
         require(f"func {test_name}()" in tests, f"missing focused XCTest {test_name}", failures)

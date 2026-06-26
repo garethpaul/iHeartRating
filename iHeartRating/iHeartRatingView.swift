@@ -394,7 +394,11 @@ open class HeartRatingView: UIView {
         guard editable else {
             return
         }
-        rating = boundedRating(rating + delta)
+        let adjustedRating = boundedRating(rating + delta)
+        guard adjustedRating != rating else {
+            return
+        }
+        rating = adjustedRating
         delegate?.heartRatingView(self, didUpdate: rating)
         bounceImageForCurrentRating()
     }
