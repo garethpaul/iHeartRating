@@ -169,11 +169,12 @@ def main() -> int:
     require('s.swift_version = "5.0"' in podspec, "podspec must declare its Swift language version", failures)
 
     require(
-        "override makefile_space := __IHEARTRATING_MAKEFILE_SPACE__" in makefile
-        and "$(subst $(space),$(makefile_space),$(MAKEFILE_LIST))" in makefile
-        and "$(subst $(makefile_space),$(space),$(abspath $(dir $(lastword $(encoded_makefile_list)))))" in makefile
+        "MAKEFILES must be empty" in makefile
+        and "MAKEFILE_LIST must not be overridden" in makefile
+        and "repository Makefile must be loaded alone" in makefile
+        and ".SECONDEXPANSION:" in makefile
         and '@python3 "$(ROOT)/scripts/test-make-spaced-path.py"' in makefile,
-        "Make targets must preserve spaces while deriving and testing the checkout root",
+        "Make targets must preserve spaces and reject ambiguous verification roots",
         failures,
     )
     require((ROOT / "scripts/test-make-spaced-path.py").is_file(), "spaced-path Make regression must remain tracked", failures)
@@ -194,7 +195,7 @@ def main() -> int:
         failures,
     )
     require(
-        re.search(r"(?m)^xcode-test:\s*$", makefile) is not None
+        re.search(r"(?m)^xcode-test::\s*$", makefile) is not None
         and '"$(ROOT)/build.sh"' in makefile,
         "Makefile must expose the executable Xcode gate",
         failures,

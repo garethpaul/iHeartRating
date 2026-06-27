@@ -10,7 +10,7 @@ path containing spaces before deriving the checkout root.
 
 ## Scope
 
-1. Derive the checkout root from an encoded `MAKEFILE_LIST` that preserves spaces.
+1. Derive the checkout root from the single loaded Makefile path while preserving spaces.
 2. Invoke the Python checker through its rooted path.
 3. Add completed-plan, external-run, recursive spaced-path, guidance, and mutation contracts.
 4. Preserve Swift, tests, project, podspec, build script, and workflow files.
@@ -24,9 +24,8 @@ path containing spaces before deriving the checkout root.
 
 ## Work Completed
 
-- Derived the checkout root from the loaded Makefile and invoked the checker
-  through its absolute path while preserving spaces and command-line override
-  resistance.
+- Derived the checkout root from the sole loaded Makefile and invoked the
+  checker through its absolute path while rejecting ambiguous Makefile inputs.
 - Added a recursive-safe full-baseline regression against a copied checkout
   whose absolute path contains spaces.
 - Added rooted invocation, completed-plan evidence, and synchronized guidance.
@@ -36,6 +35,7 @@ path containing spaces before deriving the checkout root.
 
 - Root and external-directory Make gates passed for all four aliases.
 - GNU Make 4.2 and 4.4 space-containing absolute Makefile paths passed.
+- Preloaded, overridden, additional, and recipe-replacement Makefiles failed closed.
 - The root-derivation mutation failed.
 - The checker-invocation mutation failed.
 - The plan-status mutation failed.
