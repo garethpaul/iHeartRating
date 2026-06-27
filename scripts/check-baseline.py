@@ -41,8 +41,11 @@ def main() -> int:
     workflow = read(".github/workflows/check.yml")
     podspec = read("iHeartRating.podspec")
     readme = read("README.md")
+    changes = read("CHANGES.md")
+    agents = read("AGENTS.md")
     vision = read("VISION.md")
     package_plan = read("docs/plans/2026-06-26-swift-package-support.md")
+    location_plan = read("docs/plans/2026-06-13-location-independent-make.md")
 
     require(not (ROOT / "Package.swift").exists(), "unverified Package.swift must not appear without focused SwiftPM support", failures)
     require(
@@ -165,9 +168,34 @@ def main() -> int:
     require('s.platform     = :ios, "12.0"' in podspec, "podspec must match the tested iOS deployment target", failures)
     require('s.swift_version = "5.0"' in podspec, "podspec must declare its Swift language version", failures)
 
-    require("override ROOT := $(abspath $(dir $(lastword $(MAKEFILE_LIST))))" in makefile, "Make targets must be location independent", failures)
     require(
-        re.search(r"(?m)^xcode-test:\s*$", makefile) is not None
+        "MAKEFILES must be empty" in makefile
+        and "MAKEFILE_LIST must not be overridden" in makefile
+        and "repository Makefile must be loaded alone" in makefile
+        and ".SECONDEXPANSION:" in makefile
+        and '@python3 "$(ROOT)/scripts/test-make-spaced-path.py"' in makefile,
+        "Make targets must preserve spaces and reject ambiguous verification roots",
+        failures,
+    )
+    require((ROOT / "scripts/test-make-spaced-path.py").is_file(), "spaced-path Make regression must remain tracked", failures)
+    require(
+        "paths containing spaces" in readme
+        and "absolute checkout paths containing spaces" in agents
+        and "roots containing spaces" in changes,
+        "operator guidance must document space-safe Make verification",
+        failures,
+    )
+    location_verification = location_plan.split("## Verification Completed\n", 1)
+    require(
+        re.findall(r"^status: .+$", location_plan, flags=re.MULTILINE) == ["status: completed"]
+        and len(location_verification) == 2
+        and "space-containing absolute Makefile paths passed" in location_verification[1]
+        and re.search(r"\b(?:pending|todo|tbd|not run)\b", location_verification[1], re.IGNORECASE) is None,
+        "location-independent Make plan must record completed spaced-path verification",
+        failures,
+    )
+    require(
+        re.search(r"(?m)^xcode-test::\s*$", makefile) is not None
         and '"$(ROOT)/build.sh"' in makefile,
         "Makefile must expose the executable Xcode gate",
         failures,

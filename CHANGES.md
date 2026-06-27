@@ -1,5 +1,8 @@
 # Changes
 
+- Preserved absolute Makefile roots containing spaces and added a recursive-safe full-baseline regression.
+- Rejected ambiguous Makefile inputs so later recipes cannot replace verification gates.
+
 ## 2026-06-26T12:03:17Z — P3 documentation — package support boundary
 
 - Clarified that CocoaPods and direct Xcode integration are the currently
